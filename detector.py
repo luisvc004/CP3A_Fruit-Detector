@@ -12,6 +12,7 @@ from utils.datasets import letterbox
 from utils.general import check_img_size, check_requirements, non_max_suppression, scale_coords
 from utils.plots import colors, plot_one_box
 from utils.torch_utils import select_device
+from utils.nutritional_info import get_nutritional_info
 
 
 parser = argparse.ArgumentParser()
@@ -39,12 +40,13 @@ class Detector:
         # Load model
         self.device = select_device(args.device)
         self.model = attempt_load(weights, map_location=self.device)  # load FP32 model
-        stride = int(self.model.stride.max())  # model stride
-        imgsz = check_img_size(imgsz, s=stride)  # check img_size
+        self.stride = int(self.model.stride.max())  # model stride
+        self.imgsz = check_img_size(imgsz, s=self.stride)  # check img_size
         self.names = self.model.module.names if hasattr(self.model, 'module') else self.model.names  # get class names
+        self.last_detections = []  # Store last detections
     
         if self.device.type != 'cpu':
-            self.model(torch.zeros(1, 3, imgsz, imgsz).to(self.device).type_as(next(self.model.parameters())))  # run once
+            self.model(torch.zeros(1, 3, self.imgsz, self.imgsz).to(self.device).type_as(next(self.model.parameters())))  # run once
         
     def detect(self, img):
         # img = cv2.imread(file_name)
@@ -69,6 +71,9 @@ class Detector:
         # Apply NMS
         pred = non_max_suppression(pred, args.conf_thres, args.iou_thres, classes=args.classes, agnostic=args.agnostic_nms)
 
+        # Store detections
+        self.last_detections = pred
+
         # save_path = os.path.join(self.save_dir, file_name)   
         # Process detections
         for det in pred:  # detections per image
@@ -79,8 +84,22 @@ class Detector:
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
                     c = int(cls)  # integer class
-                    label = (self.names[c] if args.hide_conf else f'{self.names[c]} {conf:.2f}')
-                    plot_one_box(xyxy, original_image, label=label, color=colors(c, True), line_thickness=2)
+                    fruit_name = self.names[c]
+                    nutritional_info = get_nutritional_info(fruit_name)
+                    
+                    # Draw box
+                    plot_one_box(xyxy, original_image, label=None, color=colors(c, True), line_thickness=2)
+                    
+                    # Draw labels separately
+                    x1, y1 = int(xyxy[0]), int(xyxy[1])
+                    if nutritional_info:
+                        cv2.putText(original_image, f"{fruit_name} {conf:.2f}", (x1, y1 - 20),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors(c, True), 2)
+                        cv2.putText(original_image, f"Cal: {nutritional_info['calories']}kcal", (x1, y1 - 5),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors(c, True), 2)
+                    else:
+                        cv2.putText(original_image, f"{fruit_name} {conf:.2f}", (x1, y1 - 10),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors(c, True), 2)
                         
         # Save results (image with detections)
         # cv2.imwrite(save_path, original_image)
