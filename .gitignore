@@ -1,6 +1,5 @@
 Fruits.pt
 *.DS_Store
-images/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
