@@ -9,7 +9,7 @@ from PySide6.QtCore import QThread, Signal, QDir
 import cv2
 from detector import Detector
 from utils.nutritional_info import get_nutritional_info, format_nutritional_info
-from collections import Counter
+from collections import Counter, defaultdict
 
 
 def convertCVImage2QtImage(cv_img):
@@ -122,11 +122,18 @@ class MainWindow(QMainWindow):
         dock.setFeatures(QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable)
         self.ui.addDockWidget(Qt.RightDockWidgetArea, dock)
         
+        # Initialize fruit history
+        self.fruit_history = defaultdict(int)
+        
         # Set initial status
         self.ui.statusbar.showMessage("Ready")
         self.ui.show()
 
     def getFile(self):
+        # Clear fruit history when loading a new file
+        self.fruit_history.clear()
+        self.nutritionalInfo.clear()
+        
         self.fileName = QFileDialog.getOpenFileName(
             self,
             'Select Image or Video',
@@ -170,16 +177,20 @@ class MainWindow(QMainWindow):
         self.ui.statusbar.showMessage("Detection complete")
 
     def update_nutritional_info(self, detections):
-        fruit_counter = Counter()
+        # Update current frame detections
+        current_fruits = Counter()
         for det in detections:
             if len(det):
                 for *_, cls in reversed(det):
                     fruit_name = self.process_image.detector.names[int(cls)]
-                    fruit_counter[fruit_name] += 1
+                    current_fruits[fruit_name] += 1
+                    # Update history with new detections
+                    self.fruit_history[fruit_name] = max(self.fruit_history[fruit_name], current_fruits[fruit_name])
 
-        if fruit_counter:
+        # Generate nutritional text using the history
+        if self.fruit_history:
             nutritional_text = "<h3>Detected Fruits:</h3>"
-            for fruit, count in fruit_counter.items():
+            for fruit, count in self.fruit_history.items():
                 info = get_nutritional_info(fruit)
                 if info:
                     nutritional_text += f"<b>{fruit} (x{count})</b><br>"

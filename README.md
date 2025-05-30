@@ -1,4 +1,4 @@
-# Trabalho CP3 - Exploração de Computer Vision (YOLO)
+# Trabalho CP3 - Exploração de Ferramenta de Visão Computacional (YOLO)
 
 ## Instituição
 
