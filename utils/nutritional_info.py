@@ -1,5 +1,5 @@
 """
-Nutritional information retrieval using Nutritionix API.
+Nutritional information retrieval using Ollama API (Mistral model).
 All values are per 100g of edible portion.
 """
 
@@ -9,13 +9,6 @@ from typing import Dict, Optional, List
 import pickle
 from pathlib import Path
 import requests
-
-# Nutritionix API credentials from environment variables
-APP_ID = os.getenv('NUTRITIONIX_APP_ID')
-API_KEY = os.getenv('NUTRITIONIX_API_KEY')
-
-if not APP_ID or not API_KEY:
-    raise ValueError("Please set NUTRITIONIX_APP_ID and NUTRITIONIX_API_KEY environment variables")
 
 # Cache file path
 CACHE_FILE = Path('utils/nutrition_cache.pkl')
@@ -39,7 +32,7 @@ def save_cache():
 
 def get_nutritional_info(fruit_name: str) -> Optional[Dict]:
     """
-    Get nutritional information for a specific fruit using Nutritionix API.
+    Get nutritional information for a specific fruit using Ollama API (Mistral model).
     Uses caching to reduce API calls.
     
     Args:
@@ -53,109 +46,42 @@ def get_nutritional_info(fruit_name: str) -> Optional[Dict]:
         return nutrition_cache[fruit_name.lower()]
 
     try:
-        # Prepare the API request
-        headers = {
-            'x-app-id': APP_ID,
-            'x-app-key': API_KEY,
-            'Content-Type': 'application/json'
-        }
+        # Prepare the prompt for Ollama
+        prompt = f"""You are a nutrition expert. Provide detailed nutritional information for {fruit_name} per 100g of edible portion.
+        Include:
+        - Calories (kcal)
+        - Protein (g)
+        - Carbohydrates (g)
+        - Fiber (g)
+        - Key vitamins
+        - Key minerals
+        - Health benefits
         
-        # Search for the fruit
-        search_url = "https://trackapi.nutritionix.com/v2/natural/nutrients"
-        search_data = {
-            "query": f"{fruit_name} raw"
-        }
-        
-        response = requests.post(search_url, headers=headers, json=search_data)
+        Format the response as a JSON object with these exact keys:
+        {{
+            "calories": number,
+            "protein": "Xg",
+            "carbs": "Xg",
+            "fiber": "Xg",
+            "vitamins": ["Vitamin A", "Vitamin C", etc],
+            "minerals": ["Calcium", "Iron", etc],
+            "benefits": ["Benefit 1", "Benefit 2", etc]
+        }}
+        """
+
+        # Call Ollama API
+        response = requests.post(
+            'http://localhost:11435/api/generate',
+            json={
+                "model": "mistral",
+                "prompt": prompt,
+                "stream": False
+            }
+        )
         response.raise_for_status()
-        nutrition_data = response.json()
         
-        if not nutrition_data.get('foods'):
-            return None
-            
-        # Get the first result
-        food = nutrition_data['foods'][0]
-        
-        # Convert to our format
-        result = {
-            'calories': int(food.get('nf_calories', 0)),
-            'protein': f"{food.get('nf_protein', 0)}g",
-            'carbs': f"{food.get('nf_total_carbohydrate', 0)}g",
-            'fiber': f"{food.get('nf_dietary_fiber', 0)}g",
-            'vitamins': [],
-            'minerals': [],
-            'benefits': []
-        }
-        
-        # Add vitamins and minerals based on available nutrients
-        if food.get('nf_vitamin_a_dv'):
-            result['vitamins'].append('Vitamin A')
-        if food.get('nf_vitamin_c_dv'):
-            result['vitamins'].append('Vitamin C')
-        if food.get('nf_vitamin_d_dv'):
-            result['vitamins'].append('Vitamin D')
-        if food.get('nf_vitamin_e_dv'):
-            result['vitamins'].append('Vitamin E')
-        if food.get('nf_vitamin_k_dv'):
-            result['vitamins'].append('Vitamin K')
-        if food.get('nf_vitamin_b6_dv'):
-            result['vitamins'].append('Vitamin B6')
-        if food.get('nf_vitamin_b12_dv'):
-            result['vitamins'].append('Vitamin B12')
-            
-        if food.get('nf_calcium_dv'):
-            result['minerals'].append('Calcium')
-        if food.get('nf_iron_dv'):
-            result['minerals'].append('Iron')
-        if food.get('nf_potassium_dv'):
-            result['minerals'].append('Potassium')
-        if food.get('nf_magnesium_dv'):
-            result['minerals'].append('Magnesium')
-        if food.get('nf_zinc_dv'):
-            result['minerals'].append('Zinc')
-        
-        # Add benefits based on nutrients
-        benefits = []
-        
-        # Add vitamin benefits
-        if result['vitamins']:
-            benefits.append(f"Rich in {', '.join(result['vitamins'])}")
-            
-        # Add mineral benefits
-        if result['minerals']:
-            benefits.append(f"Good source of {', '.join(result['minerals'])}")
-            
-        # Add fiber benefit
-        fiber = food.get('nf_dietary_fiber', 0)
-        if fiber > 2:
-            benefits.append("High in fiber")
-        elif fiber > 0:
-            benefits.append("Contains fiber")
-            
-        # Add protein benefit
-        protein = food.get('nf_protein', 0)
-        if protein > 2:
-            benefits.append("Good source of protein")
-        elif protein > 0:
-            benefits.append("Contains protein")
-            
-        # Add calorie benefit
-        calories = food.get('nf_calories', 0)
-        if calories < 50:
-            benefits.append("Low in calories")
-        elif calories < 100:
-            benefits.append("Moderate in calories")
-            
-        # Add antioxidant benefit for fruits known to be high in antioxidants
-        antioxidant_fruits = ['blueberry', 'strawberry', 'raspberry', 'pomegranate', 'grape']
-        if fruit_name.lower() in antioxidant_fruits:
-            benefits.append("High in antioxidants")
-            
-        # If no specific benefits were found, add a generic one
-        if not benefits:
-            benefits.append("Contains essential nutrients")
-            
-        result['benefits'] = benefits
+        # Parse the response
+        result = json.loads(response.json()['response'])
         
         # Cache the result
         nutrition_cache[fruit_name.lower()] = result

@@ -106,3 +106,9 @@ O conjunto de dados utilizado para treino está disponível [aqui](https://t.ly/
 ## Contribuições
 
 Este projeto foi desenvolvido com base no YOLOv5 e adaptado para deteção específica de frutas com funcionalidades de informação nutricional.
+
+
+curl https://ollama.ai/install.sh | sh
+ollama pull mistral
+ollama serve
+OLLAMA_HOST=127.0.0.1:11435 ollama serve
