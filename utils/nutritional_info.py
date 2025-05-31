@@ -1,239 +1,46 @@
 """
-Nutritional information for different fruits.
+Nutritional information retrieval using Nutritionix API.
 All values are per 100g of edible portion.
 """
 
-FRUIT_NUTRITION = {
-    'apple': {
-        'calories': 52,
-        'protein': '0.3g',
-        'carbs': '13.8g',
-        'fiber': '2.4g',
-        'vitamins': ['Vitamin C', 'Vitamin B6'],
-        'minerals': ['Potassium'],
-        'benefits': 'Rich in antioxidants and fiber, helps with digestion and heart health'
-    },
-    'banana': {
-        'calories': 89,
-        'protein': '1.1g',
-        'carbs': '22.8g',
-        'fiber': '2.6g',
-        'vitamins': ['Vitamin B6', 'Vitamin C'],
-        'minerals': ['Potassium', 'Magnesium'],
-        'benefits': 'Good source of energy, helps with muscle function and blood pressure'
-    },
-    'orange': {
-        'calories': 47,
-        'protein': '0.9g',
-        'carbs': '11.8g',
-        'fiber': '2.4g',
-        'vitamins': ['Vitamin C', 'Vitamin A'],
-        'minerals': ['Calcium', 'Potassium'],
-        'benefits': 'Excellent source of Vitamin C, boosts immune system'
-    },
-    'strawberry': {
-        'calories': 32,
-        'protein': '0.7g',
-        'carbs': '7.7g',
-        'fiber': '2.0g',
-        'vitamins': ['Vitamin C', 'Folate'],
-        'minerals': ['Manganese', 'Potassium'],
-        'benefits': 'High in antioxidants, supports heart health and skin health'
-    },
-    'grape': {
-        'calories': 69,
-        'protein': '0.6g',
-        'carbs': '18.1g',
-        'fiber': '0.9g',
-        'vitamins': ['Vitamin C', 'Vitamin K'],
-        'minerals': ['Copper', 'Potassium'],
-        'benefits': 'Contains resveratrol, good for heart health'
-    },
-    'watermelon': {
-        'calories': 30,
-        'protein': '0.6g',
-        'carbs': '7.6g',
-        'fiber': '0.4g',
-        'vitamins': ['Vitamin A', 'Vitamin C'],
-        'minerals': ['Potassium', 'Magnesium'],
-        'benefits': 'High water content, helps with hydration and contains lycopene'
-    },
-    'pineapple': {
-        'calories': 50,
-        'protein': '0.5g',
-        'carbs': '13.1g',
-        'fiber': '1.4g',
-        'vitamins': ['Vitamin C', 'Vitamin B6'],
-        'minerals': ['Manganese', 'Copper'],
-        'benefits': 'Contains bromelain, helps with digestion and inflammation'
-    },
-    'mango': {
-        'calories': 60,
-        'protein': '0.8g',
-        'carbs': '15.0g',
-        'fiber': '1.6g',
-        'vitamins': ['Vitamin A', 'Vitamin C'],
-        'minerals': ['Potassium', 'Copper'],
-        'benefits': 'Rich in Vitamin A, good for eye health and immune system'
-    },
-    'pear': {
-        'calories': 57,
-        'protein': '0.4g',
-        'carbs': '15.2g',
-        'fiber': '3.1g',
-        'vitamins': ['Vitamin C', 'Vitamin K'],
-        'minerals': ['Potassium', 'Copper'],
-        'benefits': 'High in fiber, supports digestive health and immune system'
-    },
-    'peach': {
-        'calories': 39,
-        'protein': '0.9g',
-        'carbs': '9.5g',
-        'fiber': '1.5g',
-        'vitamins': ['Vitamin C', 'Vitamin A'],
-        'minerals': ['Potassium'],
-        'benefits': 'Good for skin health and hydration'
-    },
-    'cherry': {
-        'calories': 50,
-        'protein': '1.0g',
-        'carbs': '12.2g',
-        'fiber': '1.6g',
-        'vitamins': ['Vitamin C', 'Vitamin A'],
-        'minerals': ['Potassium'],
-        'benefits': 'Rich in antioxidants, helps reduce inflammation'
-    },
-    'kiwi': {
-        'calories': 41,
-        'protein': '0.8g',
-        'carbs': '10.1g',
-        'fiber': '2.1g',
-        'vitamins': ['Vitamin C', 'Vitamin K'],
-        'minerals': ['Potassium', 'Magnesium'],
-        'benefits': 'Boosts immune system, aids digestion'
-    },
-    'lemon': {
-        'calories': 29,
-        'protein': '1.1g',
-        'carbs': '9.3g',
-        'fiber': '2.8g',
-        'vitamins': ['Vitamin C', 'Vitamin B6'],
-        'minerals': ['Potassium'],
-        'benefits': 'Excellent source of Vitamin C, supports immune function'
-    },
-    'blueberry': {
-        'calories': 57,
-        'protein': '0.7g',
-        'carbs': '14.5g',
-        'fiber': '2.4g',
-        'vitamins': ['Vitamin C', 'Vitamin K'],
-        'minerals': ['Manganese'],
-        'benefits': 'High in antioxidants, supports brain health'
-    },
-    'plum': {
-        'calories': 46,
-        'protein': '0.7g',
-        'carbs': '11.4g',
-        'fiber': '1.4g',
-        'vitamins': ['Vitamin C', 'Vitamin K'],
-        'minerals': ['Potassium', 'Copper'],
-        'benefits': 'Good for digestion and bone health'
-    },
-    'avocado': {
-        'calories': 160,
-        'protein': '2.0g',
-        'carbs': '8.5g',
-        'fiber': '6.7g',
-        'vitamins': ['Vitamin K', 'Vitamin E', 'Vitamin C'],
-        'minerals': ['Potassium', 'Magnesium'],
-        'benefits': 'Rich in healthy fats, supports heart health'
-    },
-    'papaya': {
-        'calories': 43,
-        'protein': '0.5g',
-        'carbs': '10.8g',
-        'fiber': '1.7g',
-        'vitamins': ['Vitamin C', 'Vitamin A'],
-        'minerals': ['Potassium', 'Magnesium'],
-        'benefits': 'Aids digestion, supports immune system'
-    },
-    'pomegranate': {
-        'calories': 83,
-        'protein': '1.7g',
-        'carbs': '18.7g',
-        'fiber': '4.0g',
-        'vitamins': ['Vitamin C', 'Vitamin K', 'Folate'],
-        'minerals': ['Potassium'],
-        'benefits': 'Rich in antioxidants, supports heart health'
-    },
-    'fig': {
-        'calories': 74,
-        'protein': '0.8g',
-        'carbs': '19.2g',
-        'fiber': '2.9g',
-        'vitamins': ['Vitamin B6', 'Vitamin K'],
-        'minerals': ['Potassium', 'Magnesium'],
-        'benefits': 'Good for digestion and bone health'
-    },
-    'melon': {
-        'calories': 34,
-        'protein': '0.8g',
-        'carbs': '8.2g',
-        'fiber': '0.9g',
-        'vitamins': ['Vitamin C', 'Vitamin A'],
-        'minerals': ['Potassium'],
-        'benefits': 'Hydrating, supports immune system'
-    },
-    'apricot': {
-        'calories': 48,
-        'protein': '1.4g',
-        'carbs': '11.1g',
-        'fiber': '2.0g',
-        'vitamins': ['Vitamin A', 'Vitamin C'],
-        'minerals': ['Potassium'],
-        'benefits': 'Good for skin and eye health'
-    },
-    'raspberry': {
-        'calories': 52,
-        'protein': '1.2g',
-        'carbs': '11.9g',
-        'fiber': '6.5g',
-        'vitamins': ['Vitamin C', 'Vitamin K'],
-        'minerals': ['Manganese'],
-        'benefits': 'High in fiber and antioxidants'
-    },
-    'blackberry': {
-        'calories': 43,
-        'protein': '1.4g',
-        'carbs': '9.6g',
-        'fiber': '5.3g',
-        'vitamins': ['Vitamin C', 'Vitamin K'],
-        'minerals': ['Manganese'],
-        'benefits': 'Supports brain and oral health'
-    },
-    'coconut': {
-        'calories': 354,
-        'protein': '3.3g',
-        'carbs': '15.2g',
-        'fiber': '9.0g',
-        'vitamins': ['Vitamin C', 'Folate'],
-        'minerals': ['Manganese', 'Copper'],
-        'benefits': 'Rich in healthy fats, supports metabolism'
-    },
-    'lime': {
-        'calories': 30,
-        'protein': '0.7g',
-        'carbs': '10.5g',
-        'fiber': '2.8g',
-        'vitamins': ['Vitamin C', 'Vitamin B6'],
-        'minerals': ['Potassium'],
-        'benefits': 'Boosts immunity, aids iron absorption'
-    },
-}
+import os
+import json
+from typing import Dict, Optional, List
+import pickle
+from pathlib import Path
+import requests
 
-def get_nutritional_info(fruit_name):
+# Nutritionix API credentials from environment variables
+APP_ID = os.getenv('NUTRITIONIX_APP_ID')
+API_KEY = os.getenv('NUTRITIONIX_API_KEY')
+
+if not APP_ID or not API_KEY:
+    raise ValueError("Please set NUTRITIONIX_APP_ID and NUTRITIONIX_API_KEY environment variables")
+
+# Cache file path
+CACHE_FILE = Path('utils/nutrition_cache.pkl')
+
+# Load cache if it exists
+nutrition_cache = {}
+if CACHE_FILE.exists():
+    try:
+        with open(CACHE_FILE, 'rb') as f:
+            nutrition_cache = pickle.load(f)
+    except Exception as e:
+        print(f"Error loading cache: {str(e)}")
+
+def save_cache():
+    """Save the cache to disk"""
+    try:
+        with open(CACHE_FILE, 'wb') as f:
+            pickle.dump(nutrition_cache, f)
+    except Exception as e:
+        print(f"Error saving cache: {str(e)}")
+
+def get_nutritional_info(fruit_name: str) -> Optional[Dict]:
     """
-    Get nutritional information for a specific fruit.
+    Get nutritional information for a specific fruit using Nutritionix API.
+    Uses caching to reduce API calls.
     
     Args:
         fruit_name (str): Name of the fruit in lowercase
@@ -241,9 +48,126 @@ def get_nutritional_info(fruit_name):
     Returns:
         dict: Nutritional information for the fruit or None if not found
     """
-    return FRUIT_NUTRITION.get(fruit_name.lower())
+    # Check cache first
+    if fruit_name.lower() in nutrition_cache:
+        return nutrition_cache[fruit_name.lower()]
 
-def format_nutritional_info(fruit_name, info):
+    try:
+        # Prepare the API request
+        headers = {
+            'x-app-id': APP_ID,
+            'x-app-key': API_KEY,
+            'Content-Type': 'application/json'
+        }
+        
+        # Search for the fruit
+        search_url = "https://trackapi.nutritionix.com/v2/natural/nutrients"
+        search_data = {
+            "query": f"{fruit_name} raw"
+        }
+        
+        response = requests.post(search_url, headers=headers, json=search_data)
+        response.raise_for_status()
+        nutrition_data = response.json()
+        
+        if not nutrition_data.get('foods'):
+            return None
+            
+        # Get the first result
+        food = nutrition_data['foods'][0]
+        
+        # Convert to our format
+        result = {
+            'calories': int(food.get('nf_calories', 0)),
+            'protein': f"{food.get('nf_protein', 0)}g",
+            'carbs': f"{food.get('nf_total_carbohydrate', 0)}g",
+            'fiber': f"{food.get('nf_dietary_fiber', 0)}g",
+            'vitamins': [],
+            'minerals': [],
+            'benefits': []
+        }
+        
+        # Add vitamins and minerals based on available nutrients
+        if food.get('nf_vitamin_a_dv'):
+            result['vitamins'].append('Vitamin A')
+        if food.get('nf_vitamin_c_dv'):
+            result['vitamins'].append('Vitamin C')
+        if food.get('nf_vitamin_d_dv'):
+            result['vitamins'].append('Vitamin D')
+        if food.get('nf_vitamin_e_dv'):
+            result['vitamins'].append('Vitamin E')
+        if food.get('nf_vitamin_k_dv'):
+            result['vitamins'].append('Vitamin K')
+        if food.get('nf_vitamin_b6_dv'):
+            result['vitamins'].append('Vitamin B6')
+        if food.get('nf_vitamin_b12_dv'):
+            result['vitamins'].append('Vitamin B12')
+            
+        if food.get('nf_calcium_dv'):
+            result['minerals'].append('Calcium')
+        if food.get('nf_iron_dv'):
+            result['minerals'].append('Iron')
+        if food.get('nf_potassium_dv'):
+            result['minerals'].append('Potassium')
+        if food.get('nf_magnesium_dv'):
+            result['minerals'].append('Magnesium')
+        if food.get('nf_zinc_dv'):
+            result['minerals'].append('Zinc')
+        
+        # Add benefits based on nutrients
+        benefits = []
+        
+        # Add vitamin benefits
+        if result['vitamins']:
+            benefits.append(f"Rich in {', '.join(result['vitamins'])}")
+            
+        # Add mineral benefits
+        if result['minerals']:
+            benefits.append(f"Good source of {', '.join(result['minerals'])}")
+            
+        # Add fiber benefit
+        fiber = food.get('nf_dietary_fiber', 0)
+        if fiber > 2:
+            benefits.append("High in fiber")
+        elif fiber > 0:
+            benefits.append("Contains fiber")
+            
+        # Add protein benefit
+        protein = food.get('nf_protein', 0)
+        if protein > 2:
+            benefits.append("Good source of protein")
+        elif protein > 0:
+            benefits.append("Contains protein")
+            
+        # Add calorie benefit
+        calories = food.get('nf_calories', 0)
+        if calories < 50:
+            benefits.append("Low in calories")
+        elif calories < 100:
+            benefits.append("Moderate in calories")
+            
+        # Add antioxidant benefit for fruits known to be high in antioxidants
+        antioxidant_fruits = ['blueberry', 'strawberry', 'raspberry', 'pomegranate', 'grape']
+        if fruit_name.lower() in antioxidant_fruits:
+            benefits.append("High in antioxidants")
+            
+        # If no specific benefits were found, add a generic one
+        if not benefits:
+            benefits.append("Contains essential nutrients")
+            
+        result['benefits'] = benefits
+        
+        # Cache the result
+        nutrition_cache[fruit_name.lower()] = result
+        save_cache()
+        return result
+
+    except Exception as e:
+        print(f"Error getting nutritional info for {fruit_name}: {str(e)}")
+        # If API call fails, try to use cached data if available
+        return nutrition_cache.get(fruit_name.lower())
+
+def format_nutritional_info(fruit_name: str, info: Dict) -> str:
     """
     Format nutritional information for display (HTML).
     
@@ -254,12 +178,15 @@ def format_nutritional_info(fruit_name, info):
     Returns:
         str: Formatted nutritional information
     """
+    if not info:
+        return f"No nutritional information available for {fruit_name}."
+        
     formatted = f"Nutritional Information for {fruit_name.title()} (per 100g):<br>"
     formatted += f"<b>Calories:</b> {info['calories']} kcal<br>"
     formatted += f"<b>Protein:</b> {info['protein']}<br>"
     formatted += f"<b>Carbohydrates:</b> {info['carbs']}<br>"
     formatted += f"<b>Fiber:</b> {info['fiber']}<br>"
-    formatted += f"<b>Vitamins:</b> {', '.join(info['vitamins'])}<br>"
-    formatted += f"<b>Minerals:</b> {', '.join(info['minerals'])}<br>"
-    formatted += f"<b>Benefits:</b> {info['benefits']}"
-    return formatted 
+    formatted += f"<b>Vitamins:</b> {', '.join(info['vitamins']) if info['vitamins'] else 'None'}<br>"
+    formatted += f"<b>Minerals:</b> {', '.join(info['minerals']) if info['minerals'] else 'None'}<br>"
+    formatted += f"<b>Benefits:</b> {' • '.join(info['benefits'])}"
+    return formatted

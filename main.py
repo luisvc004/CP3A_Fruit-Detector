@@ -112,8 +112,18 @@ class MainWindow(QMainWindow):
                 background-color: white;
                 border: 1px solid #ccc;
                 border-radius: 4px;
-                padding: 10px;
+                padding: 15px;
                 font-size: 14px;
+                line-height: 1.6;
+            }
+            QTextEdit h3 {
+                color: #2c3e50;
+                margin-bottom: 15px;
+                border-bottom: 2px solid #3498db;
+                padding-bottom: 5px;
+            }
+            QTextEdit b {
+                color: #2980b9;
             }
         """)
         
@@ -189,14 +199,18 @@ class MainWindow(QMainWindow):
 
         # Generate nutritional text using the history
         if self.fruit_history:
-            nutritional_text = "<h3>Detected Fruits:</h3>"
+            nutritional_text = "<h3>Detected Fruits</h3>"
             for fruit, count in self.fruit_history.items():
                 info = get_nutritional_info(fruit)
                 if info:
-                    nutritional_text += f"<b>{fruit} (x{count})</b><br>"
-                    nutritional_text += format_nutritional_info(fruit, info) + "<br><br>"
+                    nutritional_text += f"<div style='margin-bottom: 20px;'>"
+                    nutritional_text += f"<b>{fruit.title()} (x{count})</b><br>"
+                    nutritional_text += format_nutritional_info(fruit, info)
+                    nutritional_text += "</div>"
                 else:
-                    nutritional_text += f"<b>{fruit} (x{count})</b>: No nutritional information available.<br><br>"
+                    nutritional_text += f"<div style='margin-bottom: 20px;'>"
+                    nutritional_text += f"<b>{fruit.title()} (x{count})</b>: No nutritional information available."
+                    nutritional_text += "</div>"
             self.nutritionalInfo.setHtml(nutritional_text)
         else:
             self.nutritionalInfo.setText("No fruits detected.")

@@ -1,5 +1,6 @@
 Fruits.pt
 *.DS_Store
+nutrition_cache.pkl
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
