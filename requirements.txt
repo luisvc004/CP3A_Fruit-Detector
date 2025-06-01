@@ -30,5 +30,3 @@ thop  # FLOPS computation
 pycocotools>=2.0  # COCO mAP
 gTTS>=2.3.2  # Google Text-to-Speech
 pygame>=2.5.2  # For playing audio files
-# macOS text-to-speech dependencies
-pyobjc>=9.2  # This will install all required pyobjc packages

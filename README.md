@@ -1,4 +1,4 @@
-# Trabalho CP3B - Exploração de Ferramenta de Visão Computacional (YOLO)
+# Trabalho CP3B - Exploração de Ferramenta de IA Generativa
 
 ## Instituição
 
@@ -28,7 +28,13 @@ Este projeto implementa um detetor de frutas utilizando YOLOv5 com uma interface
 
 ## Contribuição Desenvolvida
 
-A principal contribuição deste trabalho foi a integração de informação nutricional ao sistema de deteção original. Foi desenvolvido um módulo que fornece dados nutricionais detalhados (calorias, vitaminas, minerais, etc.) para cada fruta detetada, enriquecendo significativamente a funcionalidade da aplicação base.
+A principal contribuição deste trabalho foi a integração de informação nutricional ao sistema de deteção original através de **IA Generativa**. Foi desenvolvido um módulo que utiliza a **API do Llama (via Ollama)** para gerar informações nutricionais detalhadas e dinâmicas para cada fruta detetada. Além disso, foi implementado um **sistema de síntese de voz (Text-to-Speech)** que permite aos utilizadores ouvir as informações geradas em formato de áudio, tornando a aplicação mais acessível e interativa.
+
+## Principais Funcionalidades Adicionadas:
+
+- **Integração com IA Generativa**: Utilização do modelo Llama para gerar informações nutricionais personalizadas
+- **Sistema Text-to-Speech**: Conversão de texto para áudio para melhor acessibilidade
+- **Interface Dinâmica**: Informações geradas em tempo real baseadas na deteção
 
 ![image56](images/fruits.jpg)
 
@@ -37,8 +43,9 @@ A principal contribuição deste trabalho foi a integração de informação nut
 ### Pré-requisitos
 
 - **Sistema Operativo**: Linux ou Windows (recomendamos Linux para melhor desempenho)
-- **Python**: Versão 3.6 ou superior
+- **Python**: Versão 3.8 ou superior
 - **PyTorch**: Versão 1.7 ou superior
+- **Ollama**: Para execução local do modelo Llama
 
 ### Instruções de Configuração
 
@@ -48,18 +55,46 @@ A principal contribuição deste trabalho foi a integração de informação nut
    
    cd CP3A_Fruit-Detector
    ```
+
+2. Configuração do Ollama (IA Generativa)
+
+    Escolha o seu Sistema Operativo para instalar o Ollama:
+
+   **Opção 1 - Terminal (Linux/macOS)**:
+
+   ```bash
+   curl https://ollama.ai/install.sh | sh
+   ```   
+
+   **Opção 2 - Interface Gráfica (Todos os sistemas)**:
    
-2. Instale as dependências necessárias:
+   1. Vá até [Download Ollama](https://ollama.ai/download)
+   2. Escolha o seu Sistema Operativo e clique no botão de download
+   3. Instale o pacote descarregado e siga as instruções
+
+    **Após a instalação, configure o modelo (todos os sistemas)**:
+
+    ```bash
+    # Descarregar o modelo Mistral
+    ollama pull mistral
+    
+    # Iniciar o servidor Ollama
+    ollama serve
+    
+    # Para configuração específica de host (se necessário):
+    OLLAMA_HOST=127.0.0.1:11435 ollama serve
+    ```
+3. Instale as dependências necessárias:
     ```bash
    pip install -r requirements.txt
     ```
 
-3. Descarregue o modelo treinado:
+4. Descarregue o modelo treinado:
 
 - Faça o download através deste link: [Modelo YOLOv5 Fruits](https://drive.google.com/file/d/1W6qZeutnqnp3YX9w4iYgR44xsoi_64ff/view?usp=sharing)
 - Coloque o ficheiro descarregado no diretório `weights/`
 
-4. Execute a aplicação:
+5. Execute a aplicação:
 
 ```bash
 python main.py
@@ -91,7 +126,9 @@ A interface gráfica permite:
 
 - Selecionar imagens ou vídeos para processamento
 - Visualizar as deteções em tempo real
-- **Consultar informação nutricional detalhada** das frutas detetadas (funcionalidade desenvolvida)
+- **Consultar informação nutricional gerada dinamicamente** através de IA Generativa (Llama)
+- **Ouvir as informações em áudio** através do sistema Text-to-Speech integrado
+- **Interação mais rica e personalizada** com conteúdo gerado em tempo real
 
 ## Dataset
 
@@ -99,18 +136,18 @@ O conjunto de dados utilizado para treino está disponível [aqui](https://t.ly/
 
 ## Resolução de Problemas
 
+### Problemas Gerais
+
 - **Mac/Linux**: Utilize preferencialmente o método de instalação com ambiente virtual
-- **Problemas de dependências**: Certifique-se de que tem Python 3.6+ e PyTorch 1.7+ instalados
+- **Problemas de dependências**: Certifique-se de que tem Python 3.8+ e PyTorch 1.7+ instalados
 - **Erro ao carregar modelo**: Verifique se o ficheiro do modelo está no diretório `weights/`
+
+### Problemas com Ollama
+
+- **Servidor não responde**: Verifique se o comando `ollama serve` está em execução
+- **Modelo não encontrado**: Execute `ollama pull mistral` para descarregar o modelo
+- **Problemas de conexão**: Verifique se a porta 11434 (padrão) está disponível
 
 ## Contribuições
 
 Este projeto foi desenvolvido com base no YOLOv5 e adaptado para deteção específica de frutas com funcionalidades de informação nutricional.
-
-
-(curl https://ollama.ai/install.sh | sh
-OU
-Ir até https://ollama.ai/download, Clique no botão de download para macOS)
-ollama pull mistral
-ollama serve
-OLLAMA_HOST=127.0.0.1:11435 ollama serve

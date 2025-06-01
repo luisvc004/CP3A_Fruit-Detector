@@ -13,6 +13,11 @@ import requests
 # Cache file path
 CACHE_FILE = Path('utils/nutrition_cache.pkl')
 
+# Define the environment variable name for the Ollama API base URL
+OLLAMA_API_BASE_URL_ENV = 'OLLAMA_API_BASE_URL'
+# Get the API base URL from the environment variable, with a default fallback
+OLLAMA_API_BASE_URL = os.getenv(OLLAMA_API_BASE_URL_ENV, 'http://localhost:11434')
+
 # Load cache if it exists
 nutrition_cache = {}
 if CACHE_FILE.exists():
@@ -71,7 +76,7 @@ def get_nutritional_info(fruit_name: str) -> Optional[Dict]:
 
         # Call Ollama API
         response = requests.post(
-            'http://localhost:11434/api/generate',
+            f'{OLLAMA_API_BASE_URL}/api/generate',
             json={
                 "model": "mistral",
                 "prompt": prompt,
