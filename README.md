@@ -62,8 +62,20 @@ Este projeto implementa um detetor de frutas utilizando YOLOv5 com uma interface
 ### 3. Informação Nutricional
 ![Informação Nutricional](images/new_image3.png)
 
-### 4. Excerto do Relatório
-![Excerto do Relatório](images/new_image4.png)
+### 4. Relatório Detalhado
+O sistema gera automaticamente um relatório em PDF contendo:
+- Imagem analisada com as deteções
+- Tabela resumo com todas as frutas detetadas
+- Análise detalhada de cada fruta:
+  - Nível de maturação
+  - Qualidade
+  - Peso estimado
+  - Defeitos detetados
+  - Recomendações de armazenamento
+- Informação nutricional completa
+- Data e hora da análise
+
+[Ver exemplo de relatório (PDF)](reports/fruit_analysis_20250601_181514.pdf)
 
 ## Configuração do Ambiente
 
