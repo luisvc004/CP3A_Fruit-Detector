@@ -71,7 +71,7 @@ def get_nutritional_info(fruit_name: str) -> Optional[Dict]:
 
         # Call Ollama API
         response = requests.post(
-            'http://localhost:11435/api/generate',
+            'http://localhost:11434/api/generate',
             json={
                 "model": "mistral",
                 "prompt": prompt,

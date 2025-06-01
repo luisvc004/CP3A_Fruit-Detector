@@ -146,8 +146,48 @@
       </item>
      </layout>
     </item>
-   </layout>
-  </widget>
+    <item>
+        <layout class="QHBoxLayout" name="audioControlsLayout">
+            <item>
+                <widget class="QPushButton" name="btn_play">
+                    <property name="styleSheet">
+                        <string notr="true">background-color: #2196F3; color: white;</string>
+                    </property>
+                    <property name="text">
+                        <string>Play Audio</string>
+                    </property>
+                </widget>
+            </item>
+            <item>
+                <widget class="QPushButton" name="btn_pause">
+                    <property name="styleSheet">
+                        <string notr="true">background-color: #FFC107; color: black;</string>
+                    </property>
+                    <property name="text">
+                        <string>Pause Audio</string>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+            </item>
+            <item>
+                <widget class="QPushButton" name="btn_stop">
+                    <property name="styleSheet">
+                        <string notr="true">background-color: #F44336; color: white;</string>
+                    </property>
+                    <property name="text">
+                        <string>Stop Audio</string>
+                    </property>
+                    <property name="enabled">
+                        <bool>false</bool>
+                    </property>
+                </widget>
+            </item>
+        </layout>
+    </item>
+</layout>
+</widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">
    <property name="text">

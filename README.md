@@ -1,4 +1,4 @@
-# Trabalho CP3 - Exploração de Ferramenta de Visão Computacional (YOLO)
+# Trabalho CP3B - Exploração de Ferramenta de Visão Computacional (YOLO)
 
 ## Instituição
 
@@ -108,7 +108,9 @@ O conjunto de dados utilizado para treino está disponível [aqui](https://t.ly/
 Este projeto foi desenvolvido com base no YOLOv5 e adaptado para deteção específica de frutas com funcionalidades de informação nutricional.
 
 
-curl https://ollama.ai/install.sh | sh
+(curl https://ollama.ai/install.sh | sh
+OU
+Ir até https://ollama.ai/download, Clique no botão de download para macOS)
 ollama pull mistral
 ollama serve
 OLLAMA_HOST=127.0.0.1:11435 ollama serve
