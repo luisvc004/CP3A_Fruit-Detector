@@ -184,11 +184,37 @@ QTextEdit {
                             </attribute>
                             <layout class="QVBoxLayout" name="verticalLayout_3">
                                 <item>
-                                    <widget class="QTextEdit" name="txt_analysis">
-                                        <property name="readOnly">
-                                            <bool>true</bool>
-                                        </property>
-                                    </widget>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_analysis">
+                                        <item>
+                                            <widget class="QTextEdit" name="txt_analysis">
+                                                <property name="readOnly">
+                                                    <bool>true</bool>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item>
+                                            <widget class="QPushButton" name="btn_audio_analysis">
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>40</width>
+                                                        <height>40</height>
+                                                    </size>
+                                                </property>
+                                                <property name="maximumSize">
+                                                    <size>
+                                                        <width>40</width>
+                                                        <height>40</height>
+                                                    </size>
+                                                </property>
+                                                <property name="text">
+                                                    <string>🔊</string>
+                                                </property>
+                                                <property name="toolTip">
+                                                    <string>Listen to analysis</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                    </layout>
                                 </item>
                             </layout>
                         </widget>
@@ -198,11 +224,37 @@ QTextEdit {
                             </attribute>
                             <layout class="QVBoxLayout" name="verticalLayout_4">
                                 <item>
-                                    <widget class="QTextEdit" name="txt_nutrition">
-                                        <property name="readOnly">
-                                            <bool>true</bool>
-                                        </property>
-                                    </widget>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_nutrition">
+                                        <item>
+                                            <widget class="QTextEdit" name="txt_nutrition">
+                                                <property name="readOnly">
+                                                    <bool>true</bool>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item>
+                                            <widget class="QPushButton" name="btn_audio_nutrition">
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>40</width>
+                                                        <height>40</height>
+                                                    </size>
+                                                </property>
+                                                <property name="maximumSize">
+                                                    <size>
+                                                        <width>40</width>
+                                                        <height>40</height>
+                                                    </size>
+                                                </property>
+                                                <property name="text">
+                                                    <string>🔊</string>
+                                                </property>
+                                                <property name="toolTip">
+                                                    <string>Listen to nutritional information</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                    </layout>
                                 </item>
                             </layout>
                         </widget>

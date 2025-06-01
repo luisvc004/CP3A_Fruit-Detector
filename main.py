@@ -15,6 +15,7 @@ import pygame
 import tempfile
 import time
 from googletrans import Translator
+import re
 
 
 def convertCVImage2QtImage(cv_img):
@@ -102,12 +103,17 @@ class show(QThread):
 
 class MainWindow(QMainWindow):
     def __init__(self):
-        super(MainWindow, self).__init__()
-        loader = QUiLoader()
-        self.ui = loader.load("ui/form.ui")
+        super().__init__()
+        print("Initializing MainWindow...")
+        self.load_ui()
+        self.setup_connections()
         
-        # Initialize pygame mixer with specific settings
-        print("Initializing pygame...")  # Debug log
+        # Initialize history dictionaries
+        self.fruit_history = defaultdict(int)
+        self.quality_history = defaultdict(list)
+        self.analysis_history = defaultdict(list)
+        
+        # Initialize pygame for audio
         try:
             pygame.init()
             pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=4096)
@@ -115,16 +121,131 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(f"Error initializing pygame: {str(e)}")
             QMessageBox.warning(self, "Audio Error", "Failed to initialize audio system. Audio features will be disabled.")
-            return
         
-        # Audio state variables
+        self.setup_audio()
+        
+        # Set initial status
+        self.ui.statusbar.showMessage("Ready")
+        print("MainWindow initialized successfully")
+
+    def load_ui(self):
+        """Load the UI from the form.ui file."""
+        try:
+            print("Loading UI from form.ui...")
+            loader = QUiLoader()
+            ui_file = QFile("ui/form.ui")
+            if not ui_file.exists():
+                print(f"Error: UI file not found at {ui_file.fileName()}")
+                return
+                
+            ui_file.open(QFile.ReadOnly)
+            self.ui = loader.load(ui_file)
+            ui_file.close()
+            
+            if not self.ui:
+                print("Error: Failed to load UI")
+                return
+                
+            self.setCentralWidget(self.ui)
+            print("UI loaded successfully")
+        except Exception as e:
+            print(f"Error loading UI: {str(e)}")
+
+    def setup_audio(self):
+        """Setup audio-related variables and connections."""
+        self.current_audio_file = None
         self.is_playing = False
-        self.current_text = ""
-        self.audio_timer = QTimer()
-        self.audio_timer.timeout.connect(self.start_audio)
         
-        self.temp_audio_file = None
+        # Connect audio buttons
+        self.ui.btn_audio_analysis.clicked.connect(lambda: self.play_audio('analysis'))
+        self.ui.btn_audio_nutrition.clicked.connect(lambda: self.play_audio('nutrition'))
         
+    def play_audio(self, tab_type):
+        """Play audio for the specified tab."""
+        print(f"Attempting to play audio for {tab_type} tab...")
+        
+        if self.is_playing:
+            print("Stopping current audio...")
+            pygame.mixer.music.stop()
+            self.is_playing = False
+            return
+            
+        # Get text from the appropriate tab
+        if tab_type == 'analysis':
+            text = self.ui.txt_analysis.toPlainText()
+        else:
+            text = self.ui.txt_nutrition.toPlainText()
+            
+        if not text:
+            print("No text to convert to speech")
+            return
+            
+        try:
+            print("Cleaning text for speech...")
+            # Clean the text for better speech
+            text = self.clean_text_for_speech(text)
+            print(f"Text to be spoken: {text[:100]}...")  # Print first 100 chars for debugging
+            
+            # Create temporary file for audio
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as temp_file:
+                temp_filename = temp_file.name
+                print(f"Created temporary file: {temp_filename}")
+                
+            # Generate speech
+            print("Generating speech...")
+            tts = gTTS(text=text, lang='en', slow=False)
+            tts.save(temp_filename)
+            print("Speech generated successfully")
+            
+            # Play the audio
+            print("Loading audio file...")
+            pygame.mixer.music.load(temp_filename)
+            print("Playing audio...")
+            pygame.mixer.music.play()
+            self.is_playing = True
+            
+            # Clean up the temporary file when done
+            def cleanup():
+                print("Cleaning up audio resources...")
+                pygame.mixer.music.unload()
+                try:
+                    os.unlink(temp_filename)
+                    print("Temporary file removed")
+                except Exception as e:
+                    print(f"Error removing temporary file: {str(e)}")
+                self.is_playing = False
+                
+            # Set up timer to clean up after audio finishes
+            # Estimate duration: roughly 0.1 seconds per character
+            duration = int(len(text) * 0.1 * 1000)
+            print(f"Estimated audio duration: {duration/1000:.1f} seconds")
+            QTimer.singleShot(duration, cleanup)
+            
+        except Exception as e:
+            print(f"Error playing audio: {str(e)}")
+            self.is_playing = False
+            QMessageBox.warning(self, "Audio Error", f"Failed to play audio: {str(e)}")
+            
+    def clean_text_for_speech(self, text):
+        """Clean text for better speech synthesis."""
+        # Remove HTML tags
+        text = re.sub(r'<[^>]+>', '', text)
+        
+        # Replace special characters
+        text = text.replace('•', '')
+        text = text.replace(':', '')
+        text = text.replace('-', '')
+        text = text.replace('|', '')
+        
+        # Add pauses for better speech
+        text = text.replace('\n', '. ')
+        
+        # Remove multiple spaces
+        text = ' '.join(text.split())
+        
+        return text
+
+    def setup_connections(self):
         # Connect menu actions
         self.ui.actionOpen.triggered.connect(self.getFile)
         self.ui.actionExit.triggered.connect(self.close)
@@ -135,133 +256,6 @@ class MainWindow(QMainWindow):
         self.ui.btn_browse.clicked.connect(self.getFile)
         self.ui.btn_start.clicked.connect(self.predict)
         
-        # Initialize fruit history
-        self.fruit_history = defaultdict(int)
-        self.quality_history = defaultdict(list)
-        self.analysis_history = defaultdict(list)
-        
-        # Set initial status
-        self.ui.statusbar.showMessage("Ready")
-        self.ui.show()
-
-    def setup_audio_controls(self):
-        # Connect button signals
-        self.ui.btn_play.clicked.connect(self.play_audio)
-        self.ui.btn_pause.clicked.connect(self.pause_audio)
-        self.ui.btn_stop.clicked.connect(self.stop_audio)
-        
-        # Initially show audio buttons
-        self.ui.btn_play.show()
-        self.ui.btn_pause.show()
-        self.ui.btn_stop.show()
-        
-        # Initially disable pause and stop buttons
-        self.ui.btn_pause.setEnabled(False)
-        self.ui.btn_stop.setEnabled(False)
-
-    def play_audio(self):
-        if not self.is_playing:
-            print("Starting audio playback process with 5-second delay...")  # Debug log
-            
-            # Disable play button and enable pause/stop immediately
-            self.ui.btn_play.setEnabled(False)
-            self.ui.btn_pause.setEnabled(True)
-            self.ui.btn_stop.setEnabled(True)
-            
-            # Start the 5-second delay timer
-            self.audio_timer.start(5000) # 5000 ms = 5 seconds delay before calling start_audio
-            
-            print("5-second delay started.") # Debug log
-
-    def start_audio(self):
-        # This function is called when the 5-second delay timer finishes
-        print("Delay finished, starting audio generation and playback...")  # Debug log
-        
-        self.is_playing = True # Set playing state here
-        
-        # Ensure audio control buttons are visible and correctly enabled
-        if self.current_text:
-            try:
-                # Create a temporary file for the audio
-                if self.temp_audio_file:
-                    os.remove(self.temp_audio_file)
-                fd, self.temp_audio_file = tempfile.mkstemp(suffix='.mp3')
-                os.close(fd)
-                print(f"Created temporary file: {self.temp_audio_file}")  # Debug log
-                
-                # Generate speech
-                print("Generating speech...")  # Debug log
-                tts = gTTS(text=self.current_text, lang='en')
-                tts.save(self.temp_audio_file)
-                print("Speech generated and saved")  # Debug log
-                
-                # Stop any currently playing audio
-                pygame.mixer.music.stop()
-                
-                # Load and play the new audio
-                print("Loading audio file...")  # Debug log
-                pygame.mixer.music.load(self.temp_audio_file)
-                print("Playing audio...")  # Debug log
-                pygame.mixer.music.play()
-                
-                # Wait for the audio to finish
-                print("Waiting for audio to finish...")  # Debug log
-                while pygame.mixer.music.get_busy():
-                    pygame.time.Clock().tick(10)
-                    QApplication.processEvents()  # Keep UI responsive
-                print("Audio finished playing")  # Debug log
-                
-            except Exception as e:
-                error_msg = f"Error playing audio: {str(e)}"
-                print(error_msg)  # Debug log
-                QMessageBox.warning(self, "Audio Error", error_msg)
-            finally:
-                self.stop_audio() # Ensure stop_audio is called when playback finishes
-        else:
-            print("No text to convert to speech")  # Debug log
-            self.stop_audio() # Ensure stop_audio is called if no text
-
-    def pause_audio(self):
-        if self.is_playing:
-            print("Pausing audio...") # Debug log
-            pygame.mixer.music.pause()
-            self.is_playing = False
-            self.ui.btn_play.setEnabled(True) # Enable Play to resume countdown
-            self.ui.btn_pause.setEnabled(False)
-
-    def stop_audio(self):
-        print("Stopping audio...")  # Debug log
-        self.is_playing = False
-        self.audio_timer.stop()
-        try:
-            pygame.mixer.music.stop()
-        except Exception as e:
-            print(f"Error stopping audio: {str(e)}")
-        
-        self.ui.btn_play.setEnabled(True)
-        self.ui.btn_pause.setEnabled(False)
-        self.ui.btn_stop.setEnabled(False)
-        
-        # Clean up temporary file if it exists
-        if self.temp_audio_file and os.path.exists(self.temp_audio_file):
-            try:
-                os.remove(self.temp_audio_file)
-                print(f"Removed temporary file: {self.temp_audio_file}")  # Debug log
-            except Exception as e:
-                print(f"Error removing temporary file: {str(e)}")  # Debug log
-            self.temp_audio_file = None
-
-    def closeEvent(self, event):
-        # Clean up temporary file when closing
-        if self.temp_audio_file and os.path.exists(self.temp_audio_file):
-            try:
-                os.remove(self.temp_audio_file)
-            except:
-                pass
-        pygame.mixer.quit()
-        pygame.quit()
-        event.accept()
-
     def getFile(self):
         # Clear history when loading a new file
         self.fruit_history.clear()
@@ -325,21 +319,17 @@ class MainWindow(QMainWindow):
                     # Update history with new detections
                     self.fruit_history[fruit_name] = max(self.fruit_history[fruit_name], current_fruits[fruit_name])
 
-        # Generate nutritional text using the history for display (HTML)
-        nutritional_html = "<h3>Detected Fruits</h3>"
-        # Also generate plain text for audio
-        plain_audio_text = "Detected Fruits. "
-        
+        # Generate nutritional text using the history
         if self.fruit_history:
+            nutritional_text = "<h3>Detected Fruits:</h3>"
             for fruit, count in self.fruit_history.items():
                 info = get_nutritional_info(fruit)
-                
-                # Format for display (HTML)
                 if info:
-                    nutritional_html += f"<div style='margin-bottom: 20px;'>"
-                    nutritional_html += f"<b>{fruit.title()} (x{count})</b><br>"
-                    nutritional_html += format_nutritional_info(fruit, info)
-                    nutritional_html += "</div>"
+                    nutritional_text += f"<b>{fruit} (x{count})</b><br>"
+                    nutritional_text += format_nutritional_info(fruit, info) + "<br><br>"
+                    
+                    # Store the text for audio playback
+                    self.current_text = nutritional_text
                 else:
                     nutritional_text += f"<b>{fruit} (x{count})</b>: No nutritional information available.<br><br>"
             self.ui.txt_nutrition.setHtml(nutritional_text)
@@ -438,6 +428,12 @@ class MainWindow(QMainWindow):
 
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = MainWindow()
-    sys.exit(app.exec())
+    try:
+        print("Starting application...")
+        app = QApplication(sys.argv)
+        window = MainWindow()
+        window.show()  # Explicitly show the window
+        print("Window shown, entering event loop...")
+        sys.exit(app.exec())
+    except Exception as e:
+        print(f"Error in main: {str(e)}")

@@ -137,43 +137,22 @@ class Detector(QObject):
                     
                     # Draw box with quality info
                     color = colors(c, True)
-                    plot_one_box(xyxy, original_image, label=None, color=color, line_thickness=3)  # Increased line thickness
+                    plot_one_box(xyxy, original_image, label=None, color=color, line_thickness=3)
                     
-                    # Draw labels with quality info
+                    # Add label with confidence and quality
                     label = f"{fruit_name} {conf:.2f}"
-                    if nutritional_info[fruit_name]:
-                        label += f" | Cal: {nutritional_info[fruit_name]['calories']}kcal"
-                    label += f" | Quality: {quality.quality_score:.2f}"
+                    if quality and hasattr(quality, 'quality_score'):
+                        try:
+                            quality_score = float(quality.quality_score)
+                            label += f" | Quality: {quality_score:.2f}"
+                        except (ValueError, TypeError):
+                            label += f" | Quality: {quality.quality_score}"
                     
-                    # Increase font size and thickness for better visibility
-                    font_scale = 1.5  # Increased from 1.0 to 1.5
-                    font_thickness = 4  # Increased from 3 to 4
-                    
-                    # Get text size to position it properly
-                    (text_width, text_height), baseline = cv2.getTextSize(
-                        label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness
-                    )
-                    
-                    # Draw background rectangle for text with padding
-                    padding = 10  # Added padding around text
-                    cv2.rectangle(
-                        original_image,
-                        (x1, y1 - text_height - padding),
-                        (x1 + text_width + padding, y1 + padding),
-                        color,
-                        -1
-                    )
-                    
-                    # Draw text with increased size
-                    cv2.putText(
-                        original_image,
-                        label,
-                        (x1 + padding//2, y1 - padding//2),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        font_scale,
-                        (255, 255, 255),  # White text for better contrast
-                        font_thickness
-                    )
+                    # Draw label
+                    t_size = cv2.getTextSize(label, 0, fontScale=0.6, thickness=1)[0]
+                    c2 = x1 + t_size[0], y1 - t_size[1] - 3
+                    cv2.rectangle(original_image, (x1, y1), c2, color, -1, cv2.LINE_AA)  # filled
+                    cv2.putText(original_image, label, (x1, y1 - 2), cv2.FONT_HERSHEY_SIMPLEX, 0.6, [225, 255, 255], 1, cv2.LINE_AA)
                     
                     # Draw ripeness indicator
                     ripeness_color = (
@@ -182,7 +161,7 @@ class Detector(QObject):
                         0
                     )
                     # Increased circle size and moved it further from text
-                    cv2.circle(original_image, (x1 + 30, y1 - text_height - 30), 12, ripeness_color, -1)
+                    cv2.circle(original_image, (x1 + 30, y1 - t_size[1] - 30), 12, ripeness_color, -1)
         
         # Store results for report generation and UI updates
         self.last_qualities = fruit_qualities

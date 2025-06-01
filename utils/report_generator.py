@@ -115,20 +115,38 @@ class ReportGenerator:
             if det['name'] in nutritional_info:
                 nutr = nutritional_info[det['name']]
                 if nutr:
-                    story.append(Paragraph("Nutritional Information:", self.styles['Heading4']))
+                    story.append(Paragraph("Nutritional Information (per 100g):", self.styles['Heading4']))
                     story.append(Spacer(1, 5))
                     
+                    # Basic nutritional info
                     nutr_text = []
                     nutr_text.append(f"Calories: {nutr['calories']} kcal")
-                    nutr_text.append(f"Protein: {nutr['protein']}g")
-                    nutr_text.append(f"Carbs: {nutr['carbs']}g")
-                    nutr_text.append(f"Fiber: {nutr['fiber']}g")
-                    nutr_text.append(f"Vitamins: {', '.join(nutr['vitamins'])}")
+                    nutr_text.append(f"Protein: {nutr['protein']}")
+                    nutr_text.append(f"Carbohydrates: {nutr['carbs']}")
+                    nutr_text.append(f"Fiber: {nutr['fiber']}")
                     
                     # Add each line as a separate paragraph with proper spacing
                     for line in nutr_text:
                         story.append(Paragraph(line, self.normal_style))
                         story.append(Spacer(1, 5))
+                    
+                    # Vitamins and Minerals
+                    if nutr.get('vitamins'):
+                        story.append(Paragraph("Vitamins:", self.styles['Heading5']))
+                        story.append(Paragraph(", ".join(nutr['vitamins']), self.normal_style))
+                        story.append(Spacer(1, 5))
+                    
+                    if nutr.get('minerals'):
+                        story.append(Paragraph("Minerals:", self.styles['Heading5']))
+                        story.append(Paragraph(", ".join(nutr['minerals']), self.normal_style))
+                        story.append(Spacer(1, 5))
+                    
+                    # Health Benefits
+                    if nutr.get('benefits'):
+                        story.append(Paragraph("Health Benefits:", self.styles['Heading5']))
+                        for benefit in nutr['benefits']:
+                            story.append(Paragraph(f"• {benefit}", self.normal_style))
+                            story.append(Spacer(1, 3))
             
             story.append(Spacer(1, 20))
         

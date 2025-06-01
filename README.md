@@ -78,7 +78,7 @@ O sistema gera automaticamente um relatório em PDF contendo:
 - Informação nutricional completa
 - Data e hora da análise
 
-[Ver exemplo de relatório (PDF)](reports/fruit_analysis_20250601_181514.pdf)
+[Ver exemplo de relatório (PDF)](reports/fruit_analysis_20250601_190019.pdf)
 
 ## Configuração do Ambiente
 

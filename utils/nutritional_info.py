@@ -112,12 +112,24 @@ def format_nutritional_info(fruit_name: str, info: Dict) -> str:
     if not info:
         return f"No nutritional information available for {fruit_name}."
         
-    formatted = f"Nutritional Information for {fruit_name.title()} (per 100g):<br>"
+    formatted = f"<div style='margin: 10px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px;'>"
     formatted += f"<b>Calories:</b> {info['calories']} kcal<br>"
     formatted += f"<b>Protein:</b> {info['protein']}<br>"
     formatted += f"<b>Carbohydrates:</b> {info['carbs']}<br>"
     formatted += f"<b>Fiber:</b> {info['fiber']}<br>"
-    formatted += f"<b>Vitamins:</b> {', '.join(info['vitamins']) if info['vitamins'] else 'None'}<br>"
-    formatted += f"<b>Minerals:</b> {', '.join(info['minerals']) if info['minerals'] else 'None'}<br>"
-    formatted += f"<b>Benefits:</b> {' • '.join(info['benefits'])}"
+    
+    if info.get('vitamins'):
+        formatted += f"<b>Vitamins:</b> {', '.join(info['vitamins'])}<br>"
+    
+    if info.get('minerals'):
+        formatted += f"<b>Minerals:</b> {', '.join(info['minerals'])}<br>"
+    
+    if info.get('benefits'):
+        formatted += "<b>Health Benefits:</b><br>"
+        formatted += "<ul>"
+        for benefit in info['benefits']:
+            formatted += f"<li>{benefit}</li>"
+        formatted += "</ul>"
+    
+    formatted += "</div>"
     return formatted
