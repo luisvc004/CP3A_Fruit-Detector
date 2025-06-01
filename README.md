@@ -24,19 +24,52 @@
 
 ## Descrição do Projecto
 
-Este projeto implementa um detetor de frutas utilizando YOLOv5 com uma interface gráfica intuitiva desenvolvida em PySide6. A aplicação permite o processamento de imagens e vídeos para deteção automática de frutas.
+Este projeto implementa um detetor de frutas utilizando YOLOv5 com uma interface gráfica intuitiva desenvolvida em PySide6. A aplicação permite o processamento de imagens e vídeos para deteção automática de frutas, análise de qualidade e informação nutricional detalhada.
 
-## Contribuição Desenvolvida
+## Funcionalidades Principais
 
-A principal contribuição deste trabalho foi a integração de informação nutricional ao sistema de deteção original. Foi desenvolvido um módulo que fornece dados nutricionais detalhados (calorias, vitaminas, minerais, etc.) para cada fruta detetada, enriquecendo significativamente a funcionalidade da aplicação base.
+1. **Deteção de Frutas em Tempo Real**
+   - Identificação precisa de diferentes tipos de frutas
+   - Visualização em tempo real com bounding boxes
+   - Indicadores de confiança para cada deteção
 
-![image56](images/fruits.jpg)
+2. **Análise de Qualidade**
+   - Avaliação do nível de maturação
+   - Deteção de defeitos
+   - Estimativa de peso
+   - Recomendações de armazenamento
+
+3. **Informação Nutricional**
+   - Calorias
+   - Proteínas
+   - Carboidratos
+   - Fibras
+   - Vitaminas
+
+4. **Interface Intuitiva**
+   - Visualização lado a lado (imagem original/deteção)
+   - Abas para análise detalhada
+   - Geração de relatórios em PDF
+
+## Screenshots
+
+### 1. Interface Principal
+![Interface Principal](images/new_image.jpeg)
+
+### 2. Análise de Qualidade
+![Análise de Qualidade](images/new_image2.png)
+
+### 3. Informação Nutricional
+![Informação Nutricional](images/new_image3.png)
+
+### 4. Excerto do Relatório
+![Excerto do Relatório](images/new_image4.png)
 
 ## Configuração do Ambiente
 
 ### Pré-requisitos
 
-- **Sistema Operativo**: Linux ou Windows (recomendamos Linux para melhor desempenho)
+- **Sistema Operativo**: Linux, Windows ou MacOS
 - **Python**: Versão 3.6 ou superior
 - **PyTorch**: Versão 1.7 ou superior
 
@@ -67,7 +100,7 @@ python main.py
 
 ## Configuração Local (Ambiente Virtual)
 
-Para uma instalação isolada utilizando ambiente virtual (recomendado para Mac):
+Para uma instalação isolada utilizando ambiente virtual (recomendado):
 
 ```bash
 # Criar ambiente virtual
@@ -85,14 +118,6 @@ pip install -r requirements.txt
 python3 main.py
 ```
 
-## Funcionalidades
-
-A interface gráfica permite:
-
-- Selecionar imagens ou vídeos para processamento
-- Visualizar as deteções em tempo real
-- **Consultar informação nutricional detalhada** das frutas detetadas (funcionalidade desenvolvida)
-
 ## Dataset
 
 O conjunto de dados utilizado para treino está disponível [aqui](https://t.ly/NZWj).
@@ -105,4 +130,8 @@ O conjunto de dados utilizado para treino está disponível [aqui](https://t.ly/
 
 ## Contribuições
 
-Este projeto foi desenvolvido com base no YOLOv5 e adaptado para deteção específica de frutas com funcionalidades de informação nutricional.
+Este projeto foi desenvolvido com base no YOLOv5 e adaptado para deteção específica de frutas, incluindo:
+- Análise de qualidade e maturação
+- Informação nutricional detalhada
+- Interface gráfica intuitiva
+- Geração de relatórios em PDF
