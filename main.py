@@ -28,6 +28,8 @@ def convertCVImage2QtImage(cv_img):
 class ProcessImage(QThread):
     signal_show_frame = Signal(object)
     signal_show_nutrition = Signal(list)
+    signal_show_analysis = Signal(list)
+    signal_show_quality = Signal(list)
 
     def __init__(self, fileName):
         QThread.__init__(self)
@@ -44,6 +46,8 @@ class ProcessImage(QThread):
                 self.frame = self.detector.detect(self.frame)
                 self.signal_show_frame.emit(self.frame)
                 self.signal_show_nutrition.emit(self.detector.last_detections)
+                self.signal_show_analysis.emit(self.detector.last_analysis)
+                self.signal_show_quality.emit(self.detector.last_qualities)
                 cv2.waitKey(30)
             self.video.release()
         else:
@@ -53,6 +57,8 @@ class ProcessImage(QThread):
                 self.frame = self.detector.detect(self.frame)
                 self.signal_show_frame.emit(self.frame)
                 self.signal_show_nutrition.emit(self.detector.last_detections)
+                self.signal_show_analysis.emit(self.detector.last_analysis)
+                self.signal_show_quality.emit(self.detector.last_qualities)
 
     def stop(self):
         try:
@@ -123,44 +129,16 @@ class MainWindow(QMainWindow):
         self.ui.actionOpen.triggered.connect(self.getFile)
         self.ui.actionExit.triggered.connect(self.close)
         self.ui.actionAbout.triggered.connect(self.showAbout)
+        self.ui.actionExport.triggered.connect(self.exportReport)
         
         # Connect buttons
         self.ui.btn_browse.clicked.connect(self.getFile)
         self.ui.btn_start.clicked.connect(self.predict)
         
-        # Setup audio controls
-        self.setup_audio_controls()
-
-        # Create and setup nutritional info dock widget
-        self.nutritionalInfo = QTextEdit()
-        self.nutritionalInfo.setReadOnly(True)
-        self.nutritionalInfo.setStyleSheet("""
-            QTextEdit {
-                background-color: white;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                padding: 15px;
-                font-size: 14px;
-                line-height: 1.6;
-            }
-            QTextEdit h3 {
-                color: #2c3e50;
-                margin-bottom: 15px;
-                border-bottom: 2px solid #3498db;
-                padding-bottom: 5px;
-            }
-            QTextEdit b {
-                color: #2980b9;
-            }
-        """)
-        
-        dock = QDockWidget("Nutritional Information", self.ui)
-        dock.setWidget(self.nutritionalInfo)
-        dock.setFeatures(QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable)
-        self.ui.addDockWidget(Qt.RightDockWidgetArea, dock)
-        
         # Initialize fruit history
         self.fruit_history = defaultdict(int)
+        self.quality_history = defaultdict(list)
+        self.analysis_history = defaultdict(list)
         
         # Set initial status
         self.ui.statusbar.showMessage("Ready")
@@ -285,9 +263,12 @@ class MainWindow(QMainWindow):
         event.accept()
 
     def getFile(self):
-        # Clear fruit history when loading a new file
+        # Clear history when loading a new file
         self.fruit_history.clear()
-        self.nutritionalInfo.clear()
+        self.quality_history.clear()
+        self.analysis_history.clear()
+        self.ui.txt_analysis.clear()
+        self.ui.txt_nutrition.clear()
         
         self.fileName = QFileDialog.getOpenFileName(
             self,
@@ -312,6 +293,8 @@ class MainWindow(QMainWindow):
         self.process_image = ProcessImage(self.fileName)
         self.process_image.signal_show_frame.connect(self.show_output)
         self.process_image.signal_show_nutrition.connect(self.update_nutritional_info)
+        self.process_image.signal_show_analysis.connect(self.update_analysis)
+        self.process_image.signal_show_quality.connect(self.update_quality)
         self.process_image.start()
 
     def show_input(self, image):
@@ -358,69 +341,103 @@ class MainWindow(QMainWindow):
                     nutritional_html += format_nutritional_info(fruit, info)
                     nutritional_html += "</div>"
                 else:
-                    nutritional_html += f"<div style='margin-bottom: 20px;'>"
-                    nutritional_html += f"<b>{fruit.title()} (x{count})</b>: No nutritional information available."
-                    nutritional_html += "</div>"
-
-                # Format for audio (Plain Text)
-                plain_audio_text += f"{fruit.title()}. Count {count}. "
-                if info:
-                    plain_audio_text += f"Nutritional Information per 100 grams: "
-                    
-                    if 'calories' in info and info['calories'] is not None:
-                        plain_audio_text += f"Calories: {info['calories']} kcal, "
-                    if 'protein' in info and info['protein'] is not None:
-                         plain_audio_text += f"Protein: {info['protein']}, "
-                    if 'carbs' in info and info['carbs'] is not None:
-                        plain_audio_text += f"Carbohydrates: {info['carbs']}, "
-                    if 'fiber' in info and info['fiber'] is not None:
-                         plain_audio_text += f"Fiber: {info['fiber']}, "
-                    
-                    if 'vitamins' in info and info['vitamins']:
-                        vitamins_text = ', '.join(info['vitamins'])
-                        plain_audio_text += f"Vitamins: {vitamins_text}. "
-                        
-                    if 'minerals' in info and info['minerals']:
-                         minerals_text = ', '.join(info['minerals'])
-                         plain_audio_text += f"Minerals: {minerals_text}. "
-
-                    if 'benefits' in info and info['benefits']:
-                        # Join benefits with periods for better separation in speech
-                        # Change to use comma and then period for a slightly longer pause
-                        benefits_text = ', '.join(info['benefits']) + '.'
-                        plain_audio_text += f"Benefits: {benefits_text} "
-                else:
-                    plain_audio_text += "No nutritional information available. "
-                    
-            self.nutritionalInfo.setHtml(nutritional_html)
-            
-            # Set the plain text for audio playback
-            self.current_text = plain_audio_text
-            print(f"Text for audio: {self.current_text}") # Debug log
-            
-            # Enable audio controls after detection
-            self.ui.btn_play.setEnabled(True)
-            self.ui.btn_pause.setEnabled(False)
-            self.ui.btn_stop.setEnabled(False)
+                    nutritional_text += f"<b>{fruit} (x{count})</b>: No nutritional information available.<br><br>"
+            self.ui.txt_nutrition.setHtml(nutritional_text)
         else:
-            self.nutritionalInfo.setText("No fruits detected.")
-            self.current_text = "No fruits detected." # Set audio text as well
-            print(f"Text for audio: {self.current_text}") # Debug log
+            self.ui.txt_nutrition.setText("No fruits detected.")
+
+    def update_analysis(self, analysis_list):
+        if analysis_list:
+            analysis_text = "<h3>Fruit Analysis:</h3>"
+            for analysis in analysis_list:
+                fruit_name = analysis['name']
+                analysis_text += f"<b>{fruit_name}</b><br>"
+                analysis_text += f"Confidence: {analysis['confidence']:.2f}<br>"
+                
+                # Add quality information
+                quality = analysis['quality']
+                analysis_text += f"Quality Score: {quality.quality_score:.2f}<br>"
+                analysis_text += f"Ripeness Level: {quality.ripeness_level:.2f}<br>"
+                analysis_text += f"Estimated Weight: {quality.estimated_weight:.1f}g<br>"
+                
+                if quality.defects:
+                    analysis_text += "Defects Detected:<br>"
+                    for defect in quality.defects:
+                        analysis_text += f"- {defect}<br>"
+                
+                if quality.recommendations:
+                    analysis_text += "Recommendations:<br>"
+                    for rec in quality.recommendations:
+                        analysis_text += f"- {rec}<br>"
+                
+                # Add nutritional information
+                if analysis['nutritional_info']:
+                    nutr = analysis['nutritional_info']
+                    analysis_text += "<br>Nutritional Information:<br>"
+                    analysis_text += f"Calories: {nutr['calories']} kcal<br>"
+                    analysis_text += f"Protein: {nutr['protein']}g<br>"
+                    analysis_text += f"Carbs: {nutr['carbs']}g<br>"
+                    analysis_text += f"Fiber: {nutr['fiber']}g<br>"
+                    analysis_text += f"Vitamins: {', '.join(nutr['vitamins'])}<br>"
+                
+                analysis_text += "<br>"
+            self.ui.txt_analysis.setHtml(analysis_text)
+        else:
+            self.ui.txt_analysis.setText("No analysis available.")
+
+    def update_quality(self, qualities):
+        if qualities:
+            quality_text = "<h3>Quality Analysis:</h3>"
+            # Get the current detections from the detector
+            if hasattr(self, 'process_image') and self.process_image.detector.last_analysis:
+                for analysis in self.process_image.detector.last_analysis:
+                    fruit_name = analysis['name']
+                    quality = analysis['quality']
+                    
+                    quality_text += f"<b>{fruit_name}</b><br>"
+                    quality_text += f"Quality Score: {quality.quality_score:.2f}<br>"
+                    quality_text += f"Ripeness Level: {quality.ripeness_level:.2f}<br>"
+                    quality_text += f"Estimated Weight: {quality.estimated_weight:.1f}g<br>"
+                    
+                    if quality.defects:
+                        quality_text += "Defects Detected:<br>"
+                        for defect in quality.defects:
+                            quality_text += f"- {defect}<br>"
+                    
+                    if quality.recommendations:
+                        quality_text += "Recommendations:<br>"
+                        for rec in quality.recommendations:
+                            quality_text += f"- {rec}<br>"
+                    
+                    quality_text += "<br>"
+            else:
+                quality_text += "No fruit analysis available."
+            self.ui.txt_analysis.setHtml(quality_text)
+        else:
+            self.ui.txt_analysis.setText("No quality analysis available.")
+
+    def exportReport(self):
+        if not hasattr(self, 'process_image') or not self.process_image.detector.last_detections:
+            QMessageBox.warning(self, "Warning", "No analysis results to export!")
+            return
             
-            # Disable audio controls if no fruits detected
-            self.ui.btn_play.setEnabled(False)
-            self.ui.btn_pause.setEnabled(False)
-            self.ui.btn_stop.setEnabled(False)
+        # The report is already generated in the detector
+        QMessageBox.information(self, "Success", "Report has been generated in the 'reports' directory.")
 
     def showAbout(self):
-        QMessageBox.about(self, "About Fruit Detection System",
-            "Fruit Detection System\n\n"
-            "A computer vision application that detects fruits in images and videos "
-            "and provides nutritional information.\n\n"
+        QMessageBox.about(self, "About",
+            "Fruit Detection and Analysis System\n\n"
+            "This application uses YOLO to detect fruits in images and videos, "
+            "analyzes their quality and ripeness, and provides nutritional information.\n\n"
+            "Features:\n"
+            "- Real-time fruit detection\n"
+            "- Quality and ripeness analysis\n"
+            "- Nutritional information\n"
+            "- Detailed reports\n\n"
             "Version 1.0")
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     app = QApplication(sys.argv)
-    app.setStyle('Fusion')  # Use Fusion style for a modern look
-    widget = MainWindow()
+    window = MainWindow()
     sys.exit(app.exec())

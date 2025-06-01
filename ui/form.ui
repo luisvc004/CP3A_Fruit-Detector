@@ -1,210 +1,237 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FruitsDetection</class>
- <widget class="QMainWindow" name="FruitsDetection">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>1512</width>
-    <height>870</height>
-   </rect>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>1512</width>
-    <height>870</height>
-   </size>
-  </property>
-  <property name="windowTitle">
-   <string>Fruit Detection System</string>
-  </property>
-  <property name="styleSheet">
-   <string notr="true">QMainWindow {
+    <class>FruitsDetection</class>
+    <widget class="QMainWindow" name="FruitsDetection">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>1512</width>
+                <height>870</height>
+            </rect>
+        </property>
+        <property name="minimumSize">
+            <size>
+                <width>1512</width>
+                <height>870</height>
+            </size>
+        </property>
+        <property name="windowTitle">
+            <string>Fruit Detection System</string>
+        </property>
+        <property name="styleSheet">
+            <string notr="true">QMainWindow {
     background-color: #f5f5f5;
-   }
-   QPushButton {
+}
+QPushButton {
     padding: 8px 16px;
     border-radius: 4px;
     font-weight: bold;
-   }
-   QPushButton:hover {
+}
+QPushButton:hover {
     background-color: #e0e0e0;
-   }
-   QLineEdit {
+}
+QLineEdit {
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
-   }
-   QLabel {
+}
+QLabel {
     border: 1px solid #ddd;
     border-radius: 4px;
-   }</string>
-  </property>
-  <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <widget class="QMenuBar" name="menubar">
-      <property name="geometry">
-       <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>1200</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <widget class="QMenu" name="menuFile">
-       <property name="title">
-        <string>File</string>
-       </property>
-       <addaction name="actionOpen"/>
-       <addaction name="actionExit"/>
-      </widget>
-      <widget class="QMenu" name="menuHelp">
-       <property name="title">
-        <string>Help</string>
-       </property>
-       <addaction name="actionAbout"/>
-      </widget>
-      <addaction name="menuFile"/>
-      <addaction name="menuHelp"/>
-     </widget>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLabel" name="lbl_input">
-        <property name="minimumSize">
-         <size>
-          <width>400</width>
-          <height>400</height>
-         </size>
+}
+QTabWidget::pane {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+}
+QTabBar::tab {
+    background: #f0f0f0;
+    padding: 8px 16px;
+    margin-right: 2px;
+}
+QTabBar::tab:selected {
+    background: white;
+    border-bottom: 2px solid #4CAF50;
+}
+QTextEdit {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+}</string>
         </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: white; padding: 10px;</string>
-        </property>
-        <property name="text">
-         <string>Input Image</string>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lbl_output">
-        <property name="minimumSize">
-         <size>
-          <width>400</width>
-          <height>400</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: white; padding: 10px;</string>
-        </property>
-        <property name="text">
-         <string>Output Image</string>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLineEdit" name="txt_address">
-        <property name="placeholderText">
-         <string>Select an image or video file...</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_browse">
-        <property name="text">
-         <string>Browse</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btn_start">
-        <property name="styleSheet">
-         <string notr="true">background-color: #4CAF50; color: white;</string>
-        </property>
-        <property name="text">
-         <string>Start Detection</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-        <layout class="QHBoxLayout" name="audioControlsLayout">
-            <item>
-                <widget class="QPushButton" name="btn_play">
-                    <property name="styleSheet">
-                        <string notr="true">background-color: #2196F3; color: white;</string>
-                    </property>
-                    <property name="text">
-                        <string>Play Audio</string>
-                    </property>
-                </widget>
-            </item>
-            <item>
-                <widget class="QPushButton" name="btn_pause">
-                    <property name="styleSheet">
-                        <string notr="true">background-color: #FFC107; color: black;</string>
-                    </property>
-                    <property name="text">
-                        <string>Pause Audio</string>
-                    </property>
-                    <property name="enabled">
-                        <bool>false</bool>
-                    </property>
-                </widget>
-            </item>
-            <item>
-                <widget class="QPushButton" name="btn_stop">
-                    <property name="styleSheet">
-                        <string notr="true">background-color: #F44336; color: white;</string>
-                    </property>
-                    <property name="text">
-                        <string>Stop Audio</string>
-                    </property>
-                    <property name="enabled">
-                        <bool>false</bool>
-                    </property>
-                </widget>
-            </item>
-        </layout>
-    </item>
-</layout>
-</widget>
-  <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionOpen">
-   <property name="text">
-    <string>Open</string>
-   </property>
-  </action>
-  <action name="actionExit">
-   <property name="text">
-    <string>Exit</string>
-   </property>
-  </action>
-  <action name="actionAbout">
-   <property name="text">
-    <string>About</string>
-   </property>
-  </action>
- </widget>
- <resources/>
- <connections/>
+        <widget class="QWidget" name="centralwidget">
+            <layout class="QVBoxLayout" name="verticalLayout">
+                <item>
+                    <widget class="QMenuBar" name="menubar">
+                        <property name="geometry">
+                            <rect>
+                                <x>0</x>
+                                <y>0</y>
+                                <width>1200</width>
+                                <height>22</height>
+                            </rect>
+                        </property>
+                        <widget class="QMenu" name="menuFile">
+                            <property name="title">
+                                <string>File</string>
+                            </property>
+                            <addaction name="actionOpen"/>
+                            <addaction name="actionExport"/>
+                            <addaction name="actionExit"/>
+                        </widget>
+                        <widget class="QMenu" name="menuHelp">
+                            <property name="title">
+                                <string>Help</string>
+                            </property>
+                            <addaction name="actionAbout"/>
+                        </widget>
+                        <addaction name="menuFile"/>
+                        <addaction name="menuHelp"/>
+                    </widget>
+                </item>
+                <item>
+                    <widget class="QTabWidget" name="tabWidget">
+                        <property name="currentIndex">
+                            <number>0</number>
+                        </property>
+                        <widget class="QWidget" name="tab_detection">
+                            <attribute name="title">
+                                <string>Detection</string>
+                            </attribute>
+                            <layout class="QVBoxLayout" name="verticalLayout_2">
+                                <item>
+                                    <layout class="QHBoxLayout" name="horizontalLayout">
+                                        <item>
+                                            <widget class="QLabel" name="lbl_input">
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>400</width>
+                                                        <height>400</height>
+                                                    </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">background-color: white; padding: 10px;</string>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Input Image</string>
+                                                </property>
+                                                <property name="scaledContents">
+                                                    <bool>true</bool>
+                                                </property>
+                                                <property name="alignment">
+                                                    <set>Qt::AlignCenter</set>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item>
+                                            <widget class="QLabel" name="lbl_output">
+                                                <property name="minimumSize">
+                                                    <size>
+                                                        <width>400</width>
+                                                        <height>400</height>
+                                                    </size>
+                                                </property>
+                                                <property name="styleSheet">
+                                                    <string notr="true">background-color: white; padding: 10px;</string>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Output Image</string>
+                                                </property>
+                                                <property name="scaledContents">
+                                                    <bool>true</bool>
+                                                </property>
+                                                <property name="alignment">
+                                                    <set>Qt::AlignCenter</set>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                    </layout>
+                                </item>
+                                <item>
+                                    <layout class="QHBoxLayout" name="horizontalLayout_2">
+                                        <item>
+                                            <widget class="QLineEdit" name="txt_address">
+                                                <property name="placeholderText">
+                                                    <string>Select an image or video file...</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item>
+                                            <widget class="QPushButton" name="btn_browse">
+                                                <property name="text">
+                                                    <string>Browse</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                        <item>
+                                            <widget class="QPushButton" name="btn_start">
+                                                <property name="styleSheet">
+                                                    <string notr="true">background-color: #4CAF50; color: white;</string>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Start Detection</string>
+                                                </property>
+                                            </widget>
+                                        </item>
+                                    </layout>
+                                </item>
+                            </layout>
+                        </widget>
+                        <widget class="QWidget" name="tab_analysis">
+                            <attribute name="title">
+                                <string>Analysis</string>
+                            </attribute>
+                            <layout class="QVBoxLayout" name="verticalLayout_3">
+                                <item>
+                                    <widget class="QTextEdit" name="txt_analysis">
+                                        <property name="readOnly">
+                                            <bool>true</bool>
+                                        </property>
+                                    </widget>
+                                </item>
+                            </layout>
+                        </widget>
+                        <widget class="QWidget" name="tab_nutrition">
+                            <attribute name="title">
+                                <string>Nutrition</string>
+                            </attribute>
+                            <layout class="QVBoxLayout" name="verticalLayout_4">
+                                <item>
+                                    <widget class="QTextEdit" name="txt_nutrition">
+                                        <property name="readOnly">
+                                            <bool>true</bool>
+                                        </property>
+                                    </widget>
+                                </item>
+                            </layout>
+                        </widget>
+                    </widget>
+                </item>
+            </layout>
+        </widget>
+        <widget class="QStatusBar" name="statusbar"/>
+        <action name="actionOpen">
+            <property name="text">
+                <string>Open</string>
+            </property>
+        </action>
+        <action name="actionExport">
+            <property name="text">
+                <string>Export Report</string>
+            </property>
+        </action>
+        <action name="actionExit">
+            <property name="text">
+                <string>Exit</string>
+            </property>
+        </action>
+        <action name="actionAbout">
+            <property name="text">
+                <string>About</string>
+            </property>
+        </action>
+    </widget>
+    <resources/>
+    <connections/>
 </ui>

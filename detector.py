@@ -6,6 +6,8 @@ import os
 import numpy as np
 import cv2
 import torch
+from PySide6.QtCore import QObject, Signal, QThread
+from PySide6.QtGui import QImage
 
 from models.experimental import attempt_load
 from utils.datasets import letterbox
@@ -13,7 +15,9 @@ from utils.general import check_img_size, check_requirements, non_max_suppressio
 from utils.plots import colors, plot_one_box
 from utils.torch_utils import select_device
 from utils.nutritional_info import get_nutritional_info
-
+from utils.fruit_analysis import FruitAnalyzer
+from utils.report_generator import ReportGenerator
+from utils.data_exporter import DataExporter
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--weights', nargs='+', type=str, default='weights/Fruits.pt', help='model.pt path(s)')
@@ -31,9 +35,15 @@ args = parser.parse_args()
 
 check_requirements(exclude=('tensorboard', 'pycocotools', 'thop'))
 
+class Detector(QObject):
+    signal_frame = Signal(QImage)
+    signal_show_analysis = Signal(list)
+    signal_show_quality = Signal(list)
+    signal_show_nutrition = Signal(dict)
+    signal_export_complete = Signal(str, str)  # filename, type
 
-class Detector:
     def __init__(self):
+        super().__init__()
         weights, imgsz = args.weights, args.img_size
         self.save_dir = 'output'
         
@@ -44,19 +54,25 @@ class Detector:
         self.imgsz = check_img_size(imgsz, s=self.stride)  # check img_size
         self.names = self.model.module.names if hasattr(self.model, 'module') else self.model.names  # get class names
         self.last_detections = []  # Store last detections
-    
+        self.last_qualities = []   # Store last quality analyses
+        self.last_nutritional_info = {}  # Store last nutritional info
+        self.last_analysis = []    # Store complete analysis results
+        self.last_frame = None
+        
+        # Initialize analyzers
+        self.fruit_analyzer = FruitAnalyzer()
+        self.report_generator = ReportGenerator()
+        self.data_exporter = DataExporter()
+        
         if self.device.type != 'cpu':
             self.model(torch.zeros(1, 3, self.imgsz, self.imgsz).to(self.device).type_as(next(self.model.parameters())))  # run once
-        
+    
     def detect(self, img):
-        # img = cv2.imread(file_name)
-
-        # file_name = Path(file_name).name
+        self.last_frame = img
         original_image = img.copy()
-
         t0 = time.time()
         
-        # img = cv2.resize(img, (416, 416))
+        # Preprocess image
         img = letterbox(img)[0]
         img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
         img = np.ascontiguousarray(img)
@@ -73,35 +89,149 @@ class Detector:
 
         # Store detections
         self.last_detections = pred
-
-        # save_path = os.path.join(self.save_dir, file_name)   
+        
         # Process detections
+        detections_info = []
+        fruit_qualities = []
+        nutritional_info = {}
+        analysis_results = []
+        
         for det in pred:  # detections per image
             if len(det):
                 # Rescale boxes from img size to original_image size
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], original_image.shape).round()
 
-                # Write results
+                # Process each detection
                 for *xyxy, conf, cls in reversed(det):
                     c = int(cls)  # integer class
                     fruit_name = self.names[c]
-                    nutritional_info = get_nutritional_info(fruit_name)
                     
-                    # Draw box
-                    plot_one_box(xyxy, original_image, label=None, color=colors(c, True), line_thickness=2)
+                    # Convert tensor coordinates to integers
+                    x1, y1, x2, y2 = map(int, xyxy)
                     
-                    # Draw labels separately
-                    x1, y1 = int(xyxy[0]), int(xyxy[1])
-                    if nutritional_info:
-                        cv2.putText(original_image, f"{fruit_name} {conf:.2f}", (x1, y1 - 20),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors(c, True), 2)
-                        cv2.putText(original_image, f"Cal: {nutritional_info['calories']}kcal", (x1, y1 - 5),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors(c, True), 2)
-                    else:
-                        cv2.putText(original_image, f"{fruit_name} {conf:.2f}", (x1, y1 - 10),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, colors(c, True), 2)
-                        
-        # Save results (image with detections)
-        # cv2.imwrite(save_path, original_image)
+                    # Get nutritional info
+                    if fruit_name not in nutritional_info:
+                        nutritional_info[fruit_name] = get_nutritional_info(fruit_name)
+                    
+                    # Analyze fruit quality
+                    quality = self.fruit_analyzer.analyze_fruit(original_image, (x1, y1, x2, y2), fruit_name)
+                    fruit_qualities.append(quality)
+                    
+                    # Create analysis result
+                    analysis_result = {
+                        'name': fruit_name,
+                        'confidence': float(conf),
+                        'bbox': [x1, y1, x2, y2],
+                        'quality': quality,
+                        'nutritional_info': nutritional_info[fruit_name]
+                    }
+                    analysis_results.append(analysis_result)
+                    
+                    # Store detection info
+                    detections_info.append({
+                        'name': fruit_name,
+                        'confidence': float(conf),
+                        'bbox': [x1, y1, x2, y2],
+                        'quality': quality
+                    })
+                    
+                    # Draw box with quality info
+                    color = colors(c, True)
+                    plot_one_box(xyxy, original_image, label=None, color=color, line_thickness=3)  # Increased line thickness
+                    
+                    # Draw labels with quality info
+                    label = f"{fruit_name} {conf:.2f}"
+                    if nutritional_info[fruit_name]:
+                        label += f" | Cal: {nutritional_info[fruit_name]['calories']}kcal"
+                    label += f" | Quality: {quality.quality_score:.2f}"
+                    
+                    # Increase font size and thickness for better visibility
+                    font_scale = 1.5  # Increased from 1.0 to 1.5
+                    font_thickness = 4  # Increased from 3 to 4
+                    
+                    # Get text size to position it properly
+                    (text_width, text_height), baseline = cv2.getTextSize(
+                        label, cv2.FONT_HERSHEY_SIMPLEX, font_scale, font_thickness
+                    )
+                    
+                    # Draw background rectangle for text with padding
+                    padding = 10  # Added padding around text
+                    cv2.rectangle(
+                        original_image,
+                        (x1, y1 - text_height - padding),
+                        (x1 + text_width + padding, y1 + padding),
+                        color,
+                        -1
+                    )
+                    
+                    # Draw text with increased size
+                    cv2.putText(
+                        original_image,
+                        label,
+                        (x1 + padding//2, y1 - padding//2),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        font_scale,
+                        (255, 255, 255),  # White text for better contrast
+                        font_thickness
+                    )
+                    
+                    # Draw ripeness indicator
+                    ripeness_color = (
+                        int(255 * (1 - quality.ripeness_level)),  # More red for less ripe
+                        int(255 * quality.ripeness_level),        # More green for more ripe
+                        0
+                    )
+                    # Increased circle size and moved it further from text
+                    cv2.circle(original_image, (x1 + 30, y1 - text_height - 30), 12, ripeness_color, -1)
+        
+        # Store results for report generation and UI updates
+        self.last_qualities = fruit_qualities
+        self.last_nutritional_info = nutritional_info
+        self.last_analysis = analysis_results
+        
+        # Emit signals
+        self.signal_show_analysis.emit(detections_info)
+        self.signal_show_quality.emit(fruit_qualities)
+        self.signal_show_nutrition.emit(nutritional_info)
+        
+        # Generate report if there are detections
+        if detections_info:
+            report_path = self.report_generator.generate_report(
+                original_image,
+                detections_info,
+                fruit_qualities,
+                nutritional_info
+            )
+            self.signal_export_complete.emit(report_path, "PDF")
+        
         print(f'Done. ({time.time() - t0:.3f}s)')
         return original_image
+
+    def export_data(self, format_type: str):
+        """Export data in the specified format."""
+        if not self.last_detections:
+            return
+        
+        if format_type == "CSV":
+            filename = self.data_exporter.export_to_csv(
+                self.last_detections,
+                self.last_qualities,
+                self.last_nutritional_info
+            )
+            self.signal_export_complete.emit(filename, "CSV")
+        
+        elif format_type == "EXCEL":
+            filename = self.data_exporter.export_to_excel(
+                self.last_detections,
+                self.last_qualities,
+                self.last_nutritional_info
+            )
+            self.signal_export_complete.emit(filename, "EXCEL")
+        
+        elif format_type == "DASHBOARD":
+            filename = self.data_exporter.generate_dashboard(
+                self.last_detections,
+                self.last_qualities,
+                self.last_nutritional_info
+            )
+            self.signal_export_complete.emit(filename, "DASHBOARD")

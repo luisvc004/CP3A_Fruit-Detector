@@ -24,9 +24,9 @@
 
 ## Descrição do Projecto
 
-Este projeto implementa um detetor de frutas utilizando YOLOv5 com uma interface gráfica intuitiva desenvolvida em PySide6. A aplicação permite o processamento de imagens e vídeos para deteção automática de frutas.
+Este projeto implementa um detetor de frutas utilizando YOLOv5 com uma interface gráfica intuitiva desenvolvida em PySide6. A aplicação permite o processamento de imagens e vídeos para deteção automática de frutas, análise de qualidade e informação nutricional detalhada.
 
-## Contribuição Desenvolvida
+## Funcionalidades Principais
 
 A principal contribuição deste trabalho foi a integração de informação nutricional ao sistema de deteção original através de **IA Generativa**. Foi desenvolvido um módulo que utiliza a **API do Llama (via Ollama)** para gerar informações nutricionais detalhadas e dinâmicas para cada fruta detetada. Além disso, foi implementado um **sistema de síntese de voz (Text-to-Speech)** que permite aos utilizadores ouvir as informações geradas em formato de áudio, tornando a aplicação mais acessível e interativa.
 
@@ -36,7 +36,49 @@ A principal contribuição deste trabalho foi a integração de informação nut
 - **Sistema Text-to-Speech**: Conversão de texto para áudio para melhor acessibilidade
 - **Interface Dinâmica**: Informações geradas em tempo real baseadas na deteção
 
-![image56](images/fruits.jpg)
+2. **Análise de Qualidade**
+   - Avaliação do nível de maturação
+   - Deteção de defeitos
+   - Estimativa de peso
+   - Recomendações de armazenamento
+
+3. **Informação Nutricional**
+   - Calorias
+   - Proteínas
+   - Carboidratos
+   - Fibras
+   - Vitaminas
+
+4. **Interface Intuitiva**
+   - Visualização lado a lado (imagem original/deteção)
+   - Abas para análise detalhada
+   - Geração de relatórios em PDF
+
+## Screenshots
+
+### 1. Interface Principal
+![Interface Principal](images/new_image.jpeg)
+
+### 2. Análise de Qualidade
+![Análise de Qualidade](images/new_image2.png)
+
+### 3. Informação Nutricional
+![Informação Nutricional](images/new_image3.png)
+
+### 4. Relatório Detalhado
+O sistema gera automaticamente um relatório em PDF contendo:
+- Imagem analisada com as deteções
+- Tabela resumo com todas as frutas detetadas
+- Análise detalhada de cada fruta:
+  - Nível de maturação
+  - Qualidade
+  - Peso estimado
+  - Defeitos detetados
+  - Recomendações de armazenamento
+- Informação nutricional completa
+- Data e hora da análise
+
+[Ver exemplo de relatório (PDF)](reports/fruit_analysis_20250601_181514.pdf)
 
 ## Configuração do Ambiente
 
@@ -102,7 +144,7 @@ python main.py
 
 ## Configuração Local (Ambiente Virtual)
 
-Para uma instalação isolada utilizando ambiente virtual (recomendado para Mac):
+Para uma instalação isolada utilizando ambiente virtual (recomendado):
 
 ```bash
 # Criar ambiente virtual
@@ -150,4 +192,8 @@ O conjunto de dados utilizado para treino está disponível [aqui](https://t.ly/
 
 ## Contribuições
 
-Este projeto foi desenvolvido com base no YOLOv5 e adaptado para deteção específica de frutas com funcionalidades de informação nutricional.
+Este projeto foi desenvolvido com base no YOLOv5 e adaptado para deteção específica de frutas, incluindo:
+- Análise de qualidade e maturação
+- Informação nutricional detalhada
+- Interface gráfica intuitiva
+- Geração de relatórios em PDF

@@ -2,15 +2,15 @@
 
 # base ----------------------------------------
 matplotlib>=3.2.2
-numpy>=1.18.5
+numpy<2.0.0
 opencv-python>=4.1.2
-Pillow
+Pillow>=7.1.2
 PyYAML>=5.3.1
 scipy>=1.4.1
 torch>=1.7.0
 torchvision>=0.8.1
 tqdm>=4.41.0
-PySide6>=6.1.3
+PySide6>=6.6.1
 requests>=2.31.0
 # logging -------------------------------------
 tensorboard>=2.4.1
@@ -18,7 +18,7 @@ tensorboard>=2.4.1
 
 # plotting ------------------------------------
 seaborn>=0.11.0
-pandas
+pandas>=1.1.4
 
 # export --------------------------------------
 # coremltools>=4.1
@@ -30,3 +30,6 @@ thop  # FLOPS computation
 pycocotools>=2.0  # COCO mAP
 gTTS>=2.3.2  # Google Text-to-Speech
 pygame>=2.5.2  # For playing audio files
+reportlab>=3.6.8
+scikit-image>=0.18.0
+scikit-learn>=0.24.2
