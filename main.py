@@ -110,24 +110,6 @@ class MainWindow(QMainWindow):
         # Connect buttons
         self.ui.btn_browse.clicked.connect(self.getFile)
         self.ui.btn_start.clicked.connect(self.predict)
-
-        # Create and setup nutritional info dock widget
-        self.nutritionalInfo = QTextEdit()
-        self.nutritionalInfo.setReadOnly(True)
-        self.nutritionalInfo.setStyleSheet("""
-            QTextEdit {
-                background-color: white;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-                padding: 10px;
-                font-size: 14px;
-            }
-        """)
-        
-        dock = QDockWidget("Nutritional Information", self.ui)
-        dock.setWidget(self.nutritionalInfo)
-        dock.setFeatures(QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable)
-        self.ui.addDockWidget(Qt.RightDockWidgetArea, dock)
         
         # Initialize fruit history
         self.fruit_history = defaultdict(int)
@@ -257,22 +239,30 @@ class MainWindow(QMainWindow):
     def update_quality(self, qualities):
         if qualities:
             quality_text = "<h3>Quality Analysis:</h3>"
-            for quality in qualities:
-                quality_text += f"Quality Score: {quality.quality_score:.2f}<br>"
-                quality_text += f"Ripeness Level: {quality.ripeness_level:.2f}<br>"
-                quality_text += f"Estimated Weight: {quality.estimated_weight:.1f}g<br>"
-                
-                if quality.defects:
-                    quality_text += "Defects Detected:<br>"
-                    for defect in quality.defects:
-                        quality_text += f"- {defect}<br>"
-                
-                if quality.recommendations:
-                    quality_text += "Recommendations:<br>"
-                    for rec in quality.recommendations:
-                        quality_text += f"- {rec}<br>"
-                
-                quality_text += "<br>"
+            # Get the current detections from the detector
+            if hasattr(self, 'process_image') and self.process_image.detector.last_analysis:
+                for analysis in self.process_image.detector.last_analysis:
+                    fruit_name = analysis['name']
+                    quality = analysis['quality']
+                    
+                    quality_text += f"<b>{fruit_name}</b><br>"
+                    quality_text += f"Quality Score: {quality.quality_score:.2f}<br>"
+                    quality_text += f"Ripeness Level: {quality.ripeness_level:.2f}<br>"
+                    quality_text += f"Estimated Weight: {quality.estimated_weight:.1f}g<br>"
+                    
+                    if quality.defects:
+                        quality_text += "Defects Detected:<br>"
+                        for defect in quality.defects:
+                            quality_text += f"- {defect}<br>"
+                    
+                    if quality.recommendations:
+                        quality_text += "Recommendations:<br>"
+                        for rec in quality.recommendations:
+                            quality_text += f"- {rec}<br>"
+                    
+                    quality_text += "<br>"
+            else:
+                quality_text += "No fruit analysis available."
             self.ui.txt_analysis.setHtml(quality_text)
         else:
             self.ui.txt_analysis.setText("No quality analysis available.")

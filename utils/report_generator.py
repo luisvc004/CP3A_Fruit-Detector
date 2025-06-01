@@ -86,23 +86,29 @@ class ReportGenerator:
         story.append(Paragraph("Detailed Analysis", self.subtitle_style))
         for det, quality in zip(detections, qualities):
             story.append(Paragraph(f"{det['name']} Analysis:", self.styles['Heading3']))
+            story.append(Spacer(1, 10))
             
             # Quality information
-            quality_text = f"Quality Score: {quality.quality_score:.2f}\n"
-            quality_text += f"Ripeness Level: {quality.ripeness_level:.2f}\n"
-            quality_text += f"Estimated Weight: {quality.estimated_weight:.1f}g\n"
+            quality_text = []
+            quality_text.append(f"Quality Score: {quality.quality_score:.2f}")
+            quality_text.append(f"Ripeness Level: {quality.ripeness_level:.2f}")
+            quality_text.append(f"Estimated Weight: {quality.estimated_weight:.1f}g")
             
             if quality.defects:
-                quality_text += "Defects Detected:\n"
+                quality_text.append("Defects Detected:")
                 for defect in quality.defects:
-                    quality_text += f"- {defect}\n"
+                    quality_text.append(f"- {defect}")
                     
             if quality.recommendations:
-                quality_text += "\nRecommendations:\n"
+                quality_text.append("Recommendations:")
                 for rec in quality.recommendations:
-                    quality_text += f"- {rec}\n"
-                    
-            story.append(Paragraph(quality_text, self.normal_style))
+                    quality_text.append(f"- {rec}")
+            
+            # Add each line as a separate paragraph with proper spacing
+            for line in quality_text:
+                story.append(Paragraph(line, self.normal_style))
+                story.append(Spacer(1, 5))
+            
             story.append(Spacer(1, 10))
             
             # Nutritional information
@@ -110,12 +116,19 @@ class ReportGenerator:
                 nutr = nutritional_info[det['name']]
                 if nutr:
                     story.append(Paragraph("Nutritional Information:", self.styles['Heading4']))
-                    nutr_text = f"Calories: {nutr['calories']} kcal\n"
-                    nutr_text += f"Protein: {nutr['protein']}g\n"
-                    nutr_text += f"Carbs: {nutr['carbs']}g\n"
-                    nutr_text += f"Fiber: {nutr['fiber']}g\n"
-                    nutr_text += f"Vitamins: {', '.join(nutr['vitamins'])}\n"
-                    story.append(Paragraph(nutr_text, self.normal_style))
+                    story.append(Spacer(1, 5))
+                    
+                    nutr_text = []
+                    nutr_text.append(f"Calories: {nutr['calories']} kcal")
+                    nutr_text.append(f"Protein: {nutr['protein']}g")
+                    nutr_text.append(f"Carbs: {nutr['carbs']}g")
+                    nutr_text.append(f"Fiber: {nutr['fiber']}g")
+                    nutr_text.append(f"Vitamins: {', '.join(nutr['vitamins'])}")
+                    
+                    # Add each line as a separate paragraph with proper spacing
+                    for line in nutr_text:
+                        story.append(Paragraph(line, self.normal_style))
+                        story.append(Spacer(1, 5))
             
             story.append(Spacer(1, 20))
         
