@@ -193,31 +193,79 @@ QTextEdit {
                                             </widget>
                                         </item>
                                         <item>
-                                            <widget class="QPushButton" name="btn_audio_analysis">
-                                                <property name="minimumSize">
-                                                    <size>
-                                                        <width>40</width>
-                                                        <height>40</height>
-                                                    </size>
-                                                </property>
-                                                <property name="maximumSize">
-                                                    <size>
-                                                        <width>40</width>
-                                                        <height>40</height>
-                                                    </size>
-                                                </property>
-                                                <property name="text">
-                                                    <string>🔊</string>
-                                                </property>
-                                                <property name="toolTip">
-                                                    <string>Listen to analysis</string>
-                                                </property>
-                                            </widget>
+                                            <layout class="QVBoxLayout" name="verticalLayout_audio_analysis">
+                                                <item>
+                                                    <widget class="QPushButton" name="btn_audio_analysis">
+                                                        <property name="minimumSize">
+                                                            <size>
+                                                                <width>60</width>
+                                                                <height>60</height>
+                                                            </size>
+                                                        </property>
+                                                        <property name="maximumSize">
+                                                            <size>
+                                                                <width>60</width>
+                                                                <height>60</height>
+                                                            </size>
+                                                        </property>
+                                                        <property name="text">
+                                                            <string>🔊</string>
+                                                        </property>
+                                                        <property name="styleSheet">
+                                                            <string notr="true">
+                                                                font-size: 24px;
+                                                                border: none;
+                                                                background: transparent;
+                                                            </string>
+                                                        </property>
+                                                        <property name="cursor">
+                                                            <cursorShape>PointingHandCursor</cursorShape>
+                                                        </property>
+                                                        <property name="toolTip">
+                                                            <string>Listen to analysis</string>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item>
+                                                    <widget class="QLabel" name="lbl_read_analysis">
+                                                        <property name="text">
+                                                            <string>Read</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>Qt::AlignCenter</set>
+                                                        </property>
+                                                        <property name="styleSheet">
+                                                            <string notr="true">
+                                                                color: #0066cc;
+                                                                text-decoration: underline;
+                                                                margin-top: 10px;
+                                                            </string>
+                                                        </property>
+                                                        <property name="cursor">
+                                                            <cursorShape>PointingHandCursor</cursorShape>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item>
+                                                    <spacer name="verticalSpacer_analysis">
+                                                        <property name="orientation">
+                                                            <enum>Qt::Vertical</enum>
+                                                        </property>
+                                                        <property name="sizeHint" stdset="0">
+                                                            <size>
+                                                                <width>20</width>
+                                                                <height>40</height>
+                                                            </size>
+                                                        </property>
+                                                    </spacer>
+                                                </item>
+                                            </layout>
                                         </item>
                                     </layout>
                                 </item>
                             </layout>
                         </widget>
+                        
                         <widget class="QWidget" name="tab_nutrition">
                             <attribute name="title">
                                 <string>Nutrition</string>
@@ -233,26 +281,73 @@ QTextEdit {
                                             </widget>
                                         </item>
                                         <item>
-                                            <widget class="QPushButton" name="btn_audio_nutrition">
-                                                <property name="minimumSize">
-                                                    <size>
-                                                        <width>40</width>
-                                                        <height>40</height>
-                                                    </size>
-                                                </property>
-                                                <property name="maximumSize">
-                                                    <size>
-                                                        <width>40</width>
-                                                        <height>40</height>
-                                                    </size>
-                                                </property>
-                                                <property name="text">
-                                                    <string>🔊</string>
-                                                </property>
-                                                <property name="toolTip">
-                                                    <string>Listen to nutritional information</string>
-                                                </property>
-                                            </widget>
+                                            <layout class="QVBoxLayout" name="verticalLayout_audio_nutrition">
+                                                <item>
+                                                    <widget class="QPushButton" name="btn_audio_nutrition">
+                                                        <property name="minimumSize">
+                                                            <size>
+                                                                <width>60</width>
+                                                                <height>60</height>
+                                                            </size>
+                                                        </property>
+                                                        <property name="maximumSize">
+                                                            <size>
+                                                                <width>60</width>
+                                                                <height>60</height>
+                                                            </size>
+                                                        </property>
+                                                        <property name="text">
+                                                            <string>🔊</string>
+                                                        </property>
+                                                        <property name="styleSheet">
+                                                            <string notr="true">
+                                                                font-size: 24px;
+                                                                border: none;
+                                                                background: transparent;
+                                                            </string>
+                                                        </property>
+                                                        <property name="cursor">
+                                                            <cursorShape>PointingHandCursor</cursorShape>
+                                                        </property>
+                                                        <property name="toolTip">
+                                                            <string>Listen to nutritional info</string>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item>
+                                                    <widget class="QLabel" name="lbl_read_nutrition">
+                                                        <property name="text">
+                                                            <string>Read</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>Qt::AlignCenter</set>
+                                                        </property>
+                                                        <property name="styleSheet">
+                                                            <string notr="true">
+                                                                color: #0066cc;
+                                                                text-decoration: underline;
+                                                                margin-top: 10px;
+                                                            </string>
+                                                        </property>
+                                                        <property name="cursor">
+                                                            <cursorShape>PointingHandCursor</cursorShape>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item>
+                                                    <spacer name="verticalSpacer_nutrition">
+                                                        <property name="orientation">
+                                                            <enum>Qt::Vertical</enum>
+                                                        </property>
+                                                        <property name="sizeHint" stdset="0">
+                                                            <size>
+                                                                <width>20</width>
+                                                                <height>40</height>
+                                                            </size>
+                                                        </property>
+                                                    </spacer>
+                                                </item>
+                                            </layout>
                                         </item>
                                     </layout>
                                 </item>
